@@ -38,9 +38,9 @@ const TREASURE_ROW := 3             ## mid-act, as the run's one guaranteed wind
 ## to 30.0% and left walk deaths at 3.
 ##
 ## Both levers move the boss and nothing else, which says the campfire is not the
-## cause. Three weighted rows of 8-34 damage normals cannot threaten 75 HP; the
-## act is decided in one fight because only one fight is dangerous. The fix is in
-## the walk's content or the boss's HP, not in where the player rests.
+## cause. Three weighted rows of 8-34 damage normals barely threaten the player,
+## so the act is decided in one fight because only one fight is dangerous. The
+## fix is in the walk's content or the boss's HP, not in where the player rests.
 const REST_ROW := ROWS - 1
 ## The row the boss hangs off. Was REST_ROW itself, which is why the rest and the
 ## boss's doorstep could not be moved apart to test that -- they were one

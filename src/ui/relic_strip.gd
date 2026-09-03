@@ -6,8 +6,10 @@ extends Control
 ## which grew to four wrapped lines at sixteen relics and ate the body below it.
 ## A row of icons is a fixed height no matter how many you own.
 
-const ICON := 22.0
-const GAP := 4.0
+## 3x the 12px source art -- an integer factor, and big enough to actually
+## point at. At 22 these were both slightly blurred and a small target.
+const ICON := 36.0
+const GAP := 6.0
 
 var relics: Array = []
 var _time: float = 0.0
@@ -40,8 +42,13 @@ func _draw() -> void:
 
 ## Per-icon tooltip, so the names are still reachable now they are not written out.
 func _get_tooltip(at_position: Vector2) -> String:
-	var i := int(at_position.x / (ICON + GAP))
+	var slot := ICON + GAP
+	var i := int(at_position.x / slot)
 	if i < 0 or i >= relics.size():
+		return ""
+	# Inside the icon, not the gap after it: hovering blank space between two
+	# held items used to describe whichever one was to the left.
+	if at_position.x - float(i) * slot > ICON:
 		return ""
 	var r: RelicData = relics[i]
 	return "%s\n%s" % [r.title, r.text]

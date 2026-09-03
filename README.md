@@ -1,4 +1,4 @@
-# Emberwright
+# Pokemon Thuglife
 
 A pixel-art roguelike deckbuilder in Godot 4.7. Slay the Spire structure; original class.
 

@@ -30,10 +30,10 @@ func execute(ctx: EffectContext) -> void:
 		# should not shout "super effective" four times.
 		if not announced and element >= 0:
 			announced = true
-			var mult := Element.multiplier(element, target.element)
-			if mult != 1.0:
+			var bonus := Element.bonus(element, target.element)
+			if bonus != 0:
 				ctx.combat.push_event(VisualEvent.EFFECTIVENESS, {
-					"who": target, "super": mult > 1.0, "multiplier": mult})
+					"who": target, "super": bonus > 0, "bonus": bonus})
 		for _i in hits:
 			if not target.is_alive():
 				break

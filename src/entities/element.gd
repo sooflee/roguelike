@@ -2,21 +2,33 @@ class_name Element
 extends RefCounted
 ## Move and creature types, and the matchup chart between them.
 ##
-## This is the genre's defining mechanic and it drops almost exactly onto the
-## damage pipeline that already exists: Combatant.calculate_damage runs an
-## ordered chain of multiplicative modifiers, which is what a type chart is.
-## Effectiveness is applied LAST, after Strength-style additive bonuses and
-## after Weak/Vulnerable, so "super effective" doubles the number the player
-## actually sees rather than some intermediate value.
+## Effectiveness here is a FLAT ADJUSTMENT, not a multiplier: a good matchup adds
+## 2 damage and a bad one takes 2 away, floored at 0. Pokemon doubles and halves;
+## this does not, deliberately.
+##
+## A multiplier scales with the hit, which makes the matchup worth almost nothing
+## on a cheap card and enormous on an expensive one -- doubling a 20-damage
+## finisher is worth +20, doubling Ember is worth +3. A flat 2 is worth the most
+## to the small, frequent cards and barely registers on the big ones, so type is
+## a reason to play a different card rather than a multiplier on the card you
+## were always going to play.
+##
+## Applied LAST, after Strength-style bonuses and after Weak/Vulnerable, so the
+## adjustment lands on the number the player can already see.
 
 enum Kind { NORMAL, FIRE, WATER, GRASS, ELECTRIC, ROCK, FLYING, POISON,
 	STEEL, FIGHTING, PSYCHIC, DRAGON }
 
-const SUPER := 2.0
-const RESIST := 0.5
+const SUPER := 2
+const RESIST := -2
+## Poison cannot touch Steel at all. Additive effectiveness has no way to
+## spell "nothing happens", so immunity stays its own value rather than a
+## bigger negative that a large enough hit would punch through.
+## Unreachable in Act 1 -- no enemy is Steel -- but the rule is real.
+const IMMUNE := -9999
 
-## attacker -> { defender: multiplier }. Only non-neutral pairs are listed;
-## anything absent is 1.0. Trimmed to the eight types this act uses rather than
+## attacker -> { defender: damage adjustment }. Only non-neutral pairs are
+## listed; anything absent is 0. Trimmed to the eight types this act uses rather than
 ## the full chart, because a matchup the player can never meet is a rule they
 ## have to learn for nothing.
 const CHART := {
@@ -28,7 +40,7 @@ const CHART := {
 	Kind.ELECTRIC: {Kind.WATER: SUPER, Kind.FLYING: SUPER, Kind.ELECTRIC: RESIST, Kind.GRASS: RESIST},
 	Kind.ROCK:     {Kind.FIRE: SUPER, Kind.FLYING: SUPER},
 	Kind.FLYING:   {Kind.GRASS: SUPER, Kind.ELECTRIC: RESIST, Kind.ROCK: RESIST},
-	Kind.POISON:   {Kind.GRASS: SUPER, Kind.POISON: RESIST, Kind.ROCK: RESIST, Kind.STEEL: 0.0},
+	Kind.POISON:   {Kind.GRASS: SUPER, Kind.POISON: RESIST, Kind.ROCK: RESIST, Kind.STEEL: IMMUNE},
 	Kind.STEEL:    {Kind.ROCK: SUPER, Kind.FIRE: RESIST, Kind.WATER: RESIST,
 					Kind.ELECTRIC: RESIST, Kind.STEEL: RESIST},
 	Kind.FIGHTING: {Kind.NORMAL: SUPER, Kind.ROCK: SUPER, Kind.STEEL: SUPER,
@@ -38,9 +50,11 @@ const CHART := {
 	Kind.DRAGON:   {Kind.DRAGON: SUPER, Kind.STEEL: RESIST},
 }
 
-static func multiplier(attack: int, defend: int) -> float:
+## Damage to add for this matchup. 0 is neutral, and the caller floors the
+## total at zero -- a resisted 1-damage hit does nothing rather than healing.
+static func bonus(attack: int, defend: int) -> int:
 	var row: Dictionary = CHART.get(attack, {})
-	return float(row.get(defend, 1.0))
+	return int(row.get(defend, 0))
 
 static func label(kind: int) -> String:
 	return String(Kind.keys()[clampi(kind, 0, Kind.size() - 1)]).capitalize()

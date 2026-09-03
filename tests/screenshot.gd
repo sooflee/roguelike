@@ -11,6 +11,7 @@ const COMBAT_VIEW := preload("res://src/ui/combat_view.gd")
 var _out := "user://shots/"
 
 var _stage := 0
+var _locked_shot := false
 var _frames := 0
 var _screen: Control
 var _combat: Combat
@@ -41,6 +42,10 @@ func _ready() -> void:
 
 func _show_map() -> void:
 	_fresh_run_screen()
+	# RunScreen boots to the title and _close_title() only dismisses it -- it
+	# does not start anything. Without this the map shot is an empty chrome with
+	# a null run, which is not a state the real game can reach.
+	_screen._start_new_run()
 
 ## A RunScreen already dismissed off the title screen.
 ##
@@ -133,8 +138,15 @@ func _process(_d: float) -> void:
 			_stage = 10
 			_frames = 0
 		10:
-			if _frames > 30:
+			if _frames > 30 and not _locked_shot:
 				await _snap("06_title")
+				# Then a LOCKED slot focused -- the only state that withholds the name,
+				# and one the default shot never shows because Charmander leads the row.
+				_screen._focus_on(1)
+				_locked_shot = true
+				_frames = 0
+			elif _locked_shot and _frames > 26:
+				await _snap("18_title_locked")
 				_stage = 11
 		11:
 			_fresh_run_screen()
@@ -245,6 +257,23 @@ func _process(_d: float) -> void:
 				await _snap("15_contact_charge")
 				_stage = 28
 		28:
+			# The victory ending, snapped AFTER the evolution resolves. The sequence
+			# is ~2.3s of alternating white silhouettes; catching it mid-flash would
+			# photograph a strobe frame rather than the thing it lands on.
+			if _screen: _screen.queue_free()
+			var won := EndingView.new()
+			var wr := RunState.new_run(1357)
+			wr.floors_cleared = 7
+			won.setup(true, wr)
+			add_child(won)
+			_screen = won
+			_stage = 29
+			_frames = 0
+		29:
+			if _frames > 420:
+				await _snap("17_victory_evolution")
+				_stage = 30
+		30:
 			print("=== done ===")
 			get_tree().quit(0)
 

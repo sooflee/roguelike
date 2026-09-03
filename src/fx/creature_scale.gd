@@ -43,6 +43,7 @@ const STANDARD_CELL := 96
 
 ## texture RID -> occupied height of frame 0, in pixels.
 static var _content: Dictionary = {}
+static var _rects: Dictionary = {}
 
 ## On-screen height, in frame pixels, for a creature `metres` tall.
 static func target_px(metres: float) -> float:
@@ -66,6 +67,26 @@ static func content_height(tex: Texture2D) -> int:
 	var h: int = maxi(1, used.size.y)
 	_content[key] = h
 	return h
+
+## The rectangle frame 0's art actually occupies inside its cell.
+##
+## These sprites are published with a lot of empty cell around them -- 42px of
+## art in a 96px box is typical -- so anything laying one out by the cell puts a
+## small creature in the middle of a large gap. Callers that want the ART
+## centred or filling a space need the rect, not the height alone.
+static func content_rect(tex: Texture2D) -> Rect2i:
+	if tex == null:
+		return Rect2i()
+	var key := tex.get_rid().get_id()
+	if _rects.has(key):
+		return _rects[key]
+	var img := tex.get_image()
+	if img == null:
+		return Rect2i()
+	var cell := img.get_height()
+	var r: Rect2i = img.get_region(Rect2i(0, 0, cell, cell)).get_used_rect()
+	_rects[key] = r
+	return r
 
 ## The scale EntityView should draw this texture at. Snapped to eighths: the
 ## exact ratio is a number nobody can verify by looking, and eighths keep two

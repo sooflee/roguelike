@@ -61,9 +61,14 @@ func _check(label: String) -> void:
 	# ENABLED, not merely present. A screen whose every control is greyed out is
 	# a dead end the player cannot leave, and counting disabled buttons let a
 	# campfire at full HP with a fully upgraded deck pass as healthy.
-	if _buttons().is_empty():
+	# The map answers clicks and the keyboard through MapView, not through
+	# buttons in the body, so a reachable node counts as something to press.
+	var map_live: bool = screen._map_view != null \
+		and is_instance_valid(screen._map_view) \
+		and not screen._map_view.available.is_empty()
+	if _buttons().is_empty() and not map_live:
 		_empty += 1
-		printerr("    screen '%s' rendered no button the player can press" % label)
+		printerr("    screen '%s' rendered nothing the player can act on" % label)
 	# Every label on screen being blank means the text never made it to the
 	# control -- which is invisible to a button-counting check, and is exactly
 	# how the whole meta UI once shipped with no prose on it at all.
@@ -408,7 +413,7 @@ func _walk_endings() -> void:
 	_check_ending("game over", "FAINTED")
 	screen.run = RunState.new_run(7788)
 	screen._show_run_complete()
-	_check_ending("run complete", "CHAMPION")
+	_check_ending("run complete", "Blastoise")
 
 func _done() -> void:
 	print("\n====================================================")

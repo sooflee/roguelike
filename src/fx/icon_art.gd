@@ -18,6 +18,62 @@ static var _cache: Dictionary = {}
 
 ## '#' body, '+' highlight, '.' transparent.
 const PATTERNS := {
+	"hud_hp": [
+		"............",
+		"..##....##..",
+		".####..####.",
+		".##########.",
+		".##+#######.",
+		".##########.",
+		"..########..",
+		"...######...",
+		"...######...",
+		"....####....",
+		".....##.....",
+		"............",
+	],
+	"hud_gold": [
+		"............",
+		"....####....",
+		"..########..",
+		".##++++++##.",
+		".#++++++++#.",
+		".#+++##+++#.",
+		".#+++##+++#.",
+		".#++++++++#.",
+		".##++++++##.",
+		"..########..",
+		"....####....",
+		"............",
+	],
+	"hud_deck": [
+		"............",
+		"...#######..",
+		"...#+++++#..",
+		"...#+++++#..",
+		".#######+#..",
+		".#+++++#+#..",
+		".#+++++#+#..",
+		".#+++++#+#..",
+		".#+++++##...",
+		".#######....",
+		"............",
+		"............",
+	],
+	"hud_bag": [
+		"............",
+		"....#..#....",
+		"...#....#...",
+		"..########..",
+		".##########.",
+		".#++++++++#.",
+		".#++####++#.",
+		".#++####++#.",
+		".#++++++++#.",
+		".##########.",
+		"..########..",
+		"............",
+	],
 	"draft": [
 		"............",
 		"..#####.....",
@@ -131,6 +187,25 @@ const PATTERNS := {
 		"............",
 	],
 }
+
+## The run header's glyphs. Colours are fixed here rather than passed in, so the
+## heart is the same red everywhere it appears and a caller cannot quietly
+## invent a fifth palette entry (D-08).
+const HUD_COLOURS := {
+	"hud_hp":   [Palette.BLOOD, Palette.ROSE],
+	"hud_gold": [Palette.FLAME, Palette.SPARK],
+	"hud_deck": [Palette.QUENCH_DEEP, Palette.INK_LIGHT],
+	"hud_bag":  [Palette.RUST, Palette.LEATHER],
+}
+
+static func hud(name: String) -> Texture2D:
+	var key := "hud:%s" % name
+	if _cache.has(key):
+		return _cache[key]
+	var cols: Array = HUD_COLOURS.get(name, [Palette.INK_MID, Palette.INK_LIGHT])
+	var tex := _from_pattern(PATTERNS[name], cols[0], cols[1])
+	_cache[key] = tex
+	return tex
 
 static func for_node(kind_name: String, body: Color, highlight: Color) -> Texture2D:
 	var key := "node:%s:%s" % [kind_name, body.to_html(false)]

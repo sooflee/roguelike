@@ -7,8 +7,9 @@ extends Node2D
 ## The run's shape is the screen's shape, and a journey reads as a journey.
 ##
 ## x is depth (MapNode.row, one stage per step) and y is lane (MapNode.col,
-## centred on ORIGIN). Origin starts at x=200 to leave the left gutter free for
-## the keyboard/screen-reader fallback in run_screen.gd.
+## centred on ORIGIN). The left gutter it leaves free used to hold a list of
+## node buttons in run_screen.gd; those are gone and this view answers the
+## keyboard itself.
 
 signal node_chosen(node)
 
@@ -23,6 +24,10 @@ var map: MapGenerator
 var current: MapNode = null
 var available: Array = []
 var hovered: MapNode = null
+## The KEYBOARD cursor, kept apart from `hovered`. Sharing one field meant any
+## twitch of the mouse set it to null and Enter then took available[0] instead
+## of the node the player had arrowed to and could see ringed.
+var _cursor: MapNode = null
 
 var _time: float = 0.0
 
@@ -79,6 +84,7 @@ func _every_node() -> Array:
 ## hovering the map itself -- the thing the player is actually looking at --
 ## told them nothing.
 func _draw_hover_label() -> void:
+	var hovered := _marked()
 	if hovered == null:
 		return
 	var font := ThemeDB.fallback_font
@@ -109,7 +115,9 @@ func _draw_node(n: MapNode) -> void:
 	if is_available:
 		# Pulse: the only moving thing on this screen, so the eye goes straight
 		# to what the player can actually do.
-		var pulse := 1.0 + sin(_time * 4.0) * 0.12
+		# Flat under reduce motion (D-23). Every other animation in this function
+		# is already gated; this one kept breathing.
+		var pulse := 1.0 + sin(_time * 4.0) * 0.12 * signf(Juice.intensity)
 		draw_circle(p, r * pulse + 5.0, Color(Palette.SPARK, 0.16))
 		draw_arc(p, r * pulse + 3.0, 0, TAU, 24, Palette.SPARK, 2.0)
 
@@ -120,7 +128,7 @@ func _draw_node(n: MapNode) -> void:
 	draw_circle(p, r + 1.0, Palette.OUTLINE)
 	draw_circle(p, r, fill)
 
-	if n == hovered:
+	if n == _marked():
 		draw_arc(p, r + 4.0, 0, TAU, 24, Palette.WHITE, 2.0)
 	if is_current:
 		draw_arc(p, r + 6.0, 0, TAU, 24, Palette.SPARK, 3.0)
@@ -193,8 +201,31 @@ func node_at(point: Vector2) -> MapNode:
 			return n
 	return null
 
+## Keyboard as well as mouse. The map used to carry a docked list of buttons
+## naming each reachable node, and that list was the only way through it without
+## a pointer -- it has been removed as clutter over the art it described, so the
+## map itself has to answer the keyboard now.
 func _input(event: InputEvent) -> void:
 	if map == null or available.is_empty():
+		return
+	# Each of these is CONSUMED. Godot runs _input before GUI input, so without
+	# set_input_as_handled() the same Enter also reaches whatever body button
+	# holds focus -- entering a map node and pressing that button in one press.
+	if event.is_action_pressed("ui_right") or event.is_action_pressed("ui_down"):
+		_step(1)
+		get_viewport().set_input_as_handled()
+		return
+	if event.is_action_pressed("ui_left") or event.is_action_pressed("ui_up"):
+		_step(-1)
+		get_viewport().set_input_as_handled()
+		return
+	if event.is_action_pressed("ui_accept"):
+		# Enter with nothing picked takes the first reachable node rather than
+		# doing nothing, so a keyboard player is never stuck on a live screen.
+		var pick: MapNode = _cursor if _cursor in available else \
+			(hovered if hovered in available else available[0])
+		get_viewport().set_input_as_handled()
+		node_chosen.emit(pick)
 		return
 	var m := get_global_mouse_position()
 	if event is InputEventMouseMotion:
@@ -206,3 +237,15 @@ func _input(event: InputEvent) -> void:
 		var n := node_at(m)
 		if n:
 			node_chosen.emit(n)
+
+## Whichever of pointer or keyboard currently owns the highlight. One ring on
+## screen at a time, whichever way the player is driving.
+func _marked() -> MapNode:
+	return hovered if hovered != null else _cursor
+
+## Moves the keyboard cursor along the reachable nodes.
+func _step(by: int) -> void:
+	var i := available.find(_cursor)
+	_cursor = available[wrapi(i + by, 0, available.size())] if i >= 0 else available[0]
+	hovered = null      # the pointer no longer owns the highlight
+	queue_redraw()

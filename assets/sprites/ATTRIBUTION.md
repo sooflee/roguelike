@@ -10,6 +10,11 @@ footing as any fan game. They must be removed before any public or commercial re
 `docs/STEAM_DISCLOSURE.md` does not cover them: that file is about AI disclosure, which is a
 different question entirely.
 
+`player/emberwright_front.png`, `player/dratini.png` and `player/ralts.png` are the Gen 5
+animated FRONT sprites, resampled from their published GIFs to 16 evenly spaced frames and
+padded onto the same 96×96 cell, bottom-centred. `player/emberwright.png` remains the back
+sprite, which is what a battle wants.
+
 Sprites are 96×96 as published. The boss is nearest-neighbour ×2 to 192×192 so it reads as larger
 than what it fights; nothing is interpolated. All re-saved as 8-bit RGBA, because the published
 files are 4-bit indexed and `tools/check_art.py` decodes with the standard library only.

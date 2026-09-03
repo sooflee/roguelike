@@ -82,10 +82,11 @@ func calculate_damage(base: int, target: Combatant, is_attack: bool = true,
 		amount = st.modify_outgoing_damage(amount, ctx)
 	for st in target._ordered_statuses():
 		amount = st.modify_incoming_damage(amount, ctx)
-	# Type effectiveness resolves LAST, so the doubling applies to the number
-	# the player can already see rather than to an intermediate value.
+	# Type effectiveness resolves LAST, so the adjustment lands on the number
+	# the player can already see rather than on an intermediate value. Flat,
+	# not a multiplier -- see Element.
 	if is_attack and move_element >= 0:
-		amount *= Element.multiplier(move_element, target.element)
+		amount += float(Element.bonus(move_element, target.element))
 	return maxi(0, int(floor(amount)))
 
 ## Applies already-calculated damage. Block absorbs first.

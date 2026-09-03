@@ -11,7 +11,7 @@ extends RefCounted
 const SAVE_PATH := "user://run.json"
 const SAVE_VERSION := 1
 
-const STARTING_HP := 75
+const STARTING_HP := 60
 const POTION_SLOTS := 3
 ## Cards drafted before the first fight, one per round. A rule, not a UI
 ## detail: the simulation has to draft the same five or it measures a deck half
@@ -41,6 +41,10 @@ var floors_cleared: int = 0
 ## continue, buy two more) and re-offered events the run had already seen.
 var seen_events: Array = []
 var removals_used: int = 0
+## Wall-clock seconds spent on this run. Accumulated by the run screen and
+## saved, so quitting and continuing resumes the clock rather than restarting
+## it -- a run timer that forgets is worse than none.
+var elapsed_seconds: float = 0.0
 
 ## Set when a node is entered so the UI knows which screen to show.
 var pending_node: MapNode = null
@@ -181,6 +185,7 @@ func to_dict() -> Dictionary:
 		"floors_cleared": floors_cleared,
 		"seen_events": seen_events,
 		"removals_used": removals_used,
+		"elapsed_seconds": elapsed_seconds,
 		"deck": deck.map(func(c: Card): return {"id": String(c.data.id), "upgraded": c.upgraded}),
 		"relics": relics.map(func(r: RelicData): return String(r.id)),
 		"potions": potions.map(func(p: PotionData): return String(p.id)),
@@ -208,6 +213,7 @@ static func from_dict(d: Dictionary) -> RunState:
 	r.floors_cleared = int(d.get("floors_cleared", 0))
 	r.seen_events = Array(d.get("seen_events", []))
 	r.removals_used = int(d.get("removals_used", 0))
+	r.elapsed_seconds = float(d.get("elapsed_seconds", 0.0))
 
 	r.deck.clear()
 	for entry in d.get("deck", []):

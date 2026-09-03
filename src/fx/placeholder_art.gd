@@ -54,6 +54,60 @@ static func for_player() -> Texture2D:
 	_cache["player"] = tex
 	return tex
 
+## The player seen from the FRONT, for menus.
+##
+## for_player() returns the BATTLE sprite, which is a back sprite -- right when
+## you are stood behind him in a fight, wrong on the title and event screens
+## where he is supposed to be facing you. They are different published sprites,
+## not a mirror of one another: the back sprite is drawn at half detail (2x2
+## pixel blocks) because Gen 5 scales it up, so flipping it would not work even
+## if the pose allowed it.
+static func for_player_front() -> Texture2D:
+	return _partner_texture("emberwright_front", "player_front")
+
+## A selectable partner's front sprite, by id. Locked ones are drawn as
+## silhouettes by the caller; the sprite itself is the real thing.
+static func for_partner(id: StringName) -> Texture2D:
+	return _partner_texture(String(id), "partner:%s" % id)
+
+static func _partner_texture(file: String, key: String) -> Texture2D:
+	if _cache.has(key):
+		return _cache[key]
+	var path := "%splayer/%s.png" % [SPRITE_DIR, file]
+	var tex: Texture2D = load(path) if ResourceLoader.exists(path) else for_player()
+	_cache[key] = tex
+	return tex
+
+## A partner drained of all colour, for a locked slot.
+##
+## A flat silhouette: every opaque pixel becomes the same grey, so all that
+## survives is the outline. modulate cannot do this -- it MULTIPLIES, so a dark
+## colour over a red Charmander gives a dark RED Charmander. Luminance was tried
+## first and kept the shading, which left the creature perfectly recognisable.
+static func for_partner_locked(id: StringName) -> Texture2D:
+	var key := "locked:%s" % id
+	if _cache.has(key):
+		return _cache[key]
+	var src := for_partner(id)
+	var img := src.get_image()
+	if img == null:
+		_cache[key] = src
+		return src
+	img = img.duplicate()
+	img.convert(Image.FORMAT_RGBA8)
+	for y in img.get_height():
+		for x in img.get_width():
+			var px := img.get_pixel(x, y)
+			if px.a < 0.5:
+				continue
+			# ONE flat grey, not per-pixel luminance. Keeping the shading kept the
+			# creature identifiable, which defeats the point -- a locked slot should
+			# give away its silhouette and nothing else.
+			img.set_pixel(x, y, Color(Palette.INK_MUTED, px.a))
+	var tex := ImageTexture.create_from_image(img)
+	_cache[key] = tex
+	return tex
+
 ## The player with his tail flame put out, for the defeat screen.
 ##
 ## The flame is painted into the sprite strip, but it is painted in three
@@ -93,31 +147,7 @@ static func for_player_snuffed() -> Texture2D:
 	_cache["player_snuffed"] = tex
 	return tex
 
-## The ink a locked roster slot is drawn in. Mid-value on purpose: near-black
-## disappears into the panel behind it, and anything brighter stops reading as
-## a shape withheld and starts reading as a design.
-const LOCKED_INK := Palette.INK_MUTED
 
-## A featureless silhouette of a partner that exists but cannot be picked yet.
-##
-## A locked slot wants a shape, not a portrait. Flattening every opaque pixel to
-## one colour drops the ramp, the eyes and the outline together, so the slot
-## says "something goes here" without spending the reveal early. `id` only seeds
-## the generator -- the same id always gives back the same silhouette, so the
-## roster does not reshuffle itself between launches.
-static func for_locked_starter(id: StringName) -> Texture2D:
-	var key := "locked:%s" % id
-	if _cache.has(key):
-		return _cache[key]
-	var img := _generate(String(id), 64).get_image().duplicate()
-	img.convert(Image.FORMAT_RGBA8)
-	for y in img.get_height():
-		for x in img.get_width():
-			if img.get_pixel(x, y).a > 0.0:
-				img.set_pixel(x, y, LOCKED_INK)
-	var tex := ImageTexture.create_from_image(img)
-	_cache[key] = tex
-	return tex
 
 ## Builds a creature silhouette on a low-res logical grid, mirrors it for
 ## bilateral symmetry (which is what makes a blob read as a creature), upscales,
@@ -290,21 +320,42 @@ static func for_event_scene(scene: StringName) -> Texture2D:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash("event:" + String(scene))
 	var img := Image.create_empty(BG_W, BG_H, false, Image.FORMAT_RGBA8)
-	var night := scene == &"night"
 
-	if night:
-		_fill_band(img, 0, 22, Palette.GROUND)
-		_dither_band(img, 22, 30, Palette.GROUND, Palette.QUENCH_DEEP)
-		_fill_band(img, 30, 56, Palette.QUENCH_DEEP)
-		_stars(img, rng, 46)
-	else:
-		_fill_band(img, 0, 16, Palette.QUENCH_DEEP)
-		_dither_band(img, 16, 20, Palette.QUENCH_DEEP, Palette.QUENCH)
-		_fill_band(img, 20, 56, Palette.QUENCH)
+	# Three skies, not two. A banked fire under a midday sky reads as a bonfire
+	# in a park, and the near-black of the night event leaves nothing of the
+	# clearing to see the fire IN. Dusk is its own hour and gets its own sky.
+	var hour := &"day"
+	if scene == &"night":
+		hour = &"night"
+	elif scene == &"campfire":
+		hour = &"dusk"
 
-	_treeline(img, rng, 56, Palette.TEAL_DARK if not night else Palette.GROUND)
-	_fill_band(img, 60, BG_H, Palette.MOSS_DARK if not night else Palette.TEAL_DARK)
-	_clumps(img, rng, 64, BG_H - 6, Palette.MOSS if not night else Palette.MOSS_DARK)
+	match hour:
+		&"night":
+			_fill_band(img, 0, 22, Palette.GROUND)
+			_dither_band(img, 22, 30, Palette.GROUND, Palette.QUENCH_DEEP)
+			_fill_band(img, 30, 56, Palette.QUENCH_DEEP)
+			_stars(img, rng, 46)
+		&"dusk":
+			# Warm at the horizon and cold overhead: the last of the light is
+			# going down behind the treeline, which is why the fire matters.
+			_fill_band(img, 0, 14, Palette.GROUND)
+			_dither_band(img, 14, 22, Palette.GROUND, Palette.VIOLET_DARK)
+			_fill_band(img, 22, 34, Palette.VIOLET_DARK)
+			_dither_band(img, 34, 42, Palette.VIOLET_DARK, Palette.EMBER_DEEP)
+			_fill_band(img, 42, 50, Palette.EMBER_DEEP)
+			_dither_band(img, 50, 56, Palette.EMBER_DEEP, Palette.EMBER_MID)
+			# Only the first few stars are out, and only above the warm band.
+			_stars(img, rng, 12, 18)
+		_:
+			_fill_band(img, 0, 16, Palette.QUENCH_DEEP)
+			_dither_band(img, 16, 20, Palette.QUENCH_DEEP, Palette.QUENCH)
+			_fill_band(img, 20, 56, Palette.QUENCH)
+
+	var dark: bool = hour != &"day"
+	_treeline(img, rng, 56, Palette.TEAL_DARK if not dark else Palette.GROUND)
+	_fill_band(img, 60, BG_H, Palette.MOSS_DARK if not dark else Palette.TEAL_DARK)
+	_clumps(img, rng, 64, BG_H - 6, Palette.MOSS if not dark else Palette.MOSS_DARK)
 
 	# Every focal feature lives low or to the right, because the text plate covers
 	# the middle of the frame and Charmander stands bottom-left. Art the plate
@@ -319,6 +370,9 @@ static func for_event_scene(scene: StringName) -> Texture2D:
 		&"rock":    _flat_rock(img, 196, 118)
 		&"workings": _workings(img, rng)
 		&"field":   _posts(img)
+		&"campfire": _campfire(img, rng)
+		&"victory": _victory(img, rng)
+		&"cache":   _strongbox(img, rng)
 		_:          pass
 
 	# Only a hint of a darker foreground. The battle plate grades the bottom 16
@@ -329,11 +383,20 @@ static func for_event_scene(scene: StringName) -> Texture2D:
 	_cache[key] = tex
 	return tex
 
-static func _stars(img: Image, rng: RandomNumberGenerator, count: int) -> void:
+## `top` is how far down the frame stars are allowed to reach. At dusk they stop
+## well short of the horizon, because the sky down there is still lit.
+static func _stars(img: Image, rng: RandomNumberGenerator, count: int, top: int = 48) -> void:
 	for i in count:
 		var x := rng.randi_range(0, BG_W - 1)
-		var y := rng.randi_range(0, 48)
+		var y := rng.randi_range(0, top)
 		img.set_pixel(x, y, Palette.BONE if rng.randf() < 0.3 else Palette.INK_MID)
+
+## Bounds-checked set_pixel. Every helper below was repeating the same four-way
+## clamp, and a scene drawn near an edge without one crashes rather than clips.
+static func _put(img: Image, x: int, y: int, col: Color) -> void:
+	if x < 0 or x >= BG_W or y < 0 or y >= BG_H:
+		return
+	img.set_pixel(x, y, col)
 
 ## Water, with a lit rim and a couple of steam wisps above it.
 static func _pool(img: Image, rng: RandomNumberGenerator, cx: int, cy: int, rx: int, ry: int) -> void:
@@ -449,6 +512,193 @@ static func _posts(img: Image) -> void:
 			for y in range(spec.y - 30, spec.y - 26):
 				if x >= 0 and x < BG_W and y >= 0 and y < BG_H:
 					img.set_pixel(x, y, Palette.LEATHER)
+
+## A fire banked down for the night: a ring of stones, coals going to ash, two
+## spent logs across them and the pool of light they throw on the ground.
+##
+## Low and right of centre, like every other focal feature here -- the text
+## plate covers the middle and Charmander stands bottom-left, so he is looking
+## AT this rather than standing on it.
+##
+## EMBER is conspicuously absent. The art bible reserves it for PP and Overload,
+## and a screen where the campfire and the PP gauge are the same orange is a
+## screen where "hot" has stopped meaning anything (§3). FLAME and SPARK carry
+## the heat instead.
+static func _campfire(img: Image, rng: RandomNumberGenerator) -> void:
+	var cx := 168
+	var cy := 116
+	# Light first, so everything after it is drawn standing IN the light rather
+	# than being washed over by it.
+	_firelight(img, cx, cy + 3, 46)
+	_fire_stones(img, cx, cy, false)
+
+	# Two spent logs, crossed, burnt through where they meet.
+	for i in 2:
+		var lean := 1 if i == 0 else -1
+		for t in range(-21, 22):
+			var y := cy - 3 + int(round(float(t) * 0.2)) * lean
+			for oy in 3:
+				_put(img, cx + t, y + oy, Palette.RUST if oy == 2 else Palette.LEATHER)
+
+	# Coals: a low mound, hottest in the middle, ash at the rim.
+	for y in range(cy - 6, cy + 5):
+		for x in range(cx - 16, cx + 17):
+			var dx := float(x - cx) / 16.0
+			var dy := float(y - cy + 1) / 5.5
+			var d := dx * dx + dy * dy
+			if d > 1.0:
+				continue
+			var col := Palette.BONE if d > 0.78 else Palette.EMBER_DEEP
+			if d < 0.46:
+				col = Palette.FLAME
+			if d < 0.15:
+				col = Palette.SPARK
+			_put(img, x, y, col)
+
+	# A few tongues still going. Short ones: this is banked, not roaring, and a
+	# tall flame here would climb straight into the text plate.
+	#
+	# Tapered and leaning, because a 1px column of orange is a straw. The width
+	# falls off with t squared so the base stays fat and only the last third
+	# comes to a point, which is the shape that reads as fire at 4x.
+	for i in 5:
+		var fx := cx + rng.randi_range(-9, 9)
+		var h := rng.randi_range(6, 13)
+		for step in h:
+			var t := float(step) / float(h)
+			var w := int(round(lerpf(2.4, 0.0, t * t)))
+			var lean := int(round(sin(t * 2.4 + float(i)) * 2.0))
+			for ox in range(-w, w + 1):
+				var hot: bool = t < 0.32 and absi(ox) < w
+				_put(img, fx + ox + lean, cy - 5 - step,
+					Palette.SPARK if hot else Palette.FLAME)
+
+	_fire_stones(img, cx, cy, true)
+
+## The ring, in two passes. The stones behind the fire are drawn before the
+## coals and the ones in front after it, or the ring paints over the thing it
+## is supposed to be containing.
+static func _fire_stones(img: Image, cx: int, cy: int, front: bool) -> void:
+	for a in range(0, 360, 30):
+		var r := deg_to_rad(float(a))
+		if (sin(r) >= 0.0) != front:
+			continue
+		var sx := cx + int(round(cos(r) * 23.0))
+		var sy := cy + 2 + int(round(sin(r) * 9.0))
+		for oy in 5:
+			for ox in 6:
+				# Lit along the top, in shadow underneath: light is top-left,
+				# except here it is also coming off the coals from the middle.
+				_put(img, sx + ox - 3, sy + oy - 2,
+					Palette.INK_MUTED if oy < 2 else Palette.SHADOW)
+
+## The pool of light a fire throws. Recolours the ground already there rather
+## than painting a disc over it, so the grass tufts stay visible inside it, and
+## flattened to an ellipse because light lands on ground, not on the picture
+## plane. The outer edge dithers out; a hard rim reads as a painted circle.
+static func _firelight(img: Image, cx: int, cy: int, r: int) -> void:
+	for y in range(cy - r, cy + r + 1):
+		for x in range(cx - r, cx + r + 1):
+			if x < 0 or x >= BG_W or y < 0 or y >= BG_H:
+				continue
+			var dx := float(x - cx) / float(r)
+			var dy := float(y - cy) / (float(r) * 0.42)
+			var d := sqrt(dx * dx + dy * dy)
+			if d > 1.0 or _is_sky(img.get_pixel(x, y)):
+				continue
+			if d < 0.40:
+				img.set_pixel(x, y, Palette.LEATHER)
+			elif d < 0.66:
+				img.set_pixel(x, y, Palette.RUST)
+			elif d < 0.86:
+				img.set_pixel(x, y, Palette.SHADOW)
+			else:
+				var cell: int = (int(x / 2.0) % 2) + (int(y / 2.0) % 2) * 2
+				if (1.0 - d) / 0.14 > (BAYER[cell] + 0.5) / 4.0:
+					img.set_pixel(x, y, Palette.SHADOW)
+
+## The field a moment after the fight ended: the two battle platforms, the far
+## one scorched and empty, and the sun already breaking over it.
+##
+## The platforms are the whole point. They are the shape that says "a battle
+## happened here" -- rolling hills say landscape -- and the reward screen was
+## the one place in the game that had just had a battle and did not show it.
+static func _victory(img: Image, rng: RandomNumberGenerator) -> void:
+	_sun(img, 208, 24, 12)
+	# The enemy's, further back and to the right of the plate; then Charmander's,
+	# nearer, lower and larger, under where he actually stands.
+	_platform(img, 188, 104, 38, 8)
+	_scorch(img, rng, 188, 104, 30)
+	_platform(img, 30, 119, 32, 8)
+
+## A low sun. Two flat rings and a dithered corona -- a soft-edged sun needs
+## colours the locked palette does not have, and a 1px checker at this size
+## shimmers instead of glowing (art bible rule 4).
+static func _sun(img: Image, cx: int, cy: int, r: int) -> void:
+	for y in range(cy - r - 5, cy + r + 6):
+		for x in range(cx - r - 5, cx + r + 6):
+			var d := Vector2(float(x - cx), float(y - cy)).length()
+			if d <= float(r) - 2.0:
+				_put(img, x, y, Palette.SPARK)
+			elif d <= float(r):
+				_put(img, x, y, Palette.FLAME)
+			elif d <= float(r) + 4.0:
+				var cell: int = (int(x / 2.0) % 2) + (int(y / 2.0) % 2) * 2
+				if (float(r) + 4.0 - d) / 4.0 > (BAYER[cell] + 0.5) / 4.0:
+					_put(img, x, y, Palette.FLAME)
+
+## What the fight left behind on the far platform. Kept small: this is a screen
+## for choosing a card, not a crime scene.
+static func _scorch(img: Image, rng: RandomNumberGenerator, cx: int, cy: int, rx: int) -> void:
+	for _i in 30:
+		var a := rng.randf() * TAU
+		var d := sqrt(rng.randf())
+		_put(img, cx + int(round(cos(a) * d * float(rx))),
+			cy + int(round(sin(a) * d * float(rx) * 0.3)), Palette.SHADOW)
+	for _i in 5:
+		_put(img, cx + rng.randi_range(-rx, rx), cy + rng.randi_range(-3, 4),
+			Palette.EMBER_DEEP)
+
+## A strongbox out of the slag, sprung open, with the spill still where it fell.
+## The heap goes right and the box low-centre, clear of both the plate and the
+## ground Charmander is standing on.
+static func _strongbox(img: Image, rng: RandomNumberGenerator) -> void:
+	_rocks(img, rng, [Vector2i(222, 116), Vector2i(236, 96), Vector2i(206, 100)])
+	# Right of centre, and right of where the Continue button lands: the box was
+	# half behind it, which is a poor showing for the one thing on the screen.
+	var cx := 162
+	var cy := 121
+	# The lid, thrown back behind the box. Without it this is a crate nobody
+	# has opened, which is the opposite of what just happened.
+	for y in range(cy - 18, cy - 10):
+		var inset := y - cy + 18
+		for x in range(cx - 13 + inset, cx + 14 - inset):
+			_put(img, x, y, Palette.RUST if inset < 4 else Palette.LEATHER)
+	for y in range(cy - 10, cy + 5):
+		for x in range(cx - 15, cx + 16):
+			var edge: bool = x <= cx - 14 or x >= cx + 14 or y >= cy + 3
+			_put(img, x, y, Palette.RUST if edge else Palette.LEATHER)
+	for y in range(cy - 10, cy + 5):
+		for x in [cx - 8, cx - 7, cx + 7, cx + 8]:
+			_put(img, x, y, Palette.INK_MUTED)
+	for y in range(cy - 4, cy + 1):
+		for x in range(cx - 2, cx + 3):
+			_put(img, x, y, Palette.BONE)
+	# Heaped over the rim, and spilled down the front.
+	for _i in 24:
+		_coin(img, cx + rng.randi_range(-12, 11), cy - 13 + rng.randi_range(0, 5))
+	for _i in 14:
+		_coin(img, cx + rng.randi_range(-30, 28), cy + rng.randi_range(4, 12))
+
+## One coin, three pixels across: a lit face and a rim, which is all a coin gets
+## at this scale. The corners are left empty so it reads round rather than square.
+static func _coin(img: Image, x: int, y: int) -> void:
+	for oy in 3:
+		for ox in 3:
+			if ox == 1 and oy == 1:
+				_put(img, x + ox, y + oy, Palette.SPARK)
+			elif (ox == 1) != (oy == 1):
+				_put(img, x + ox, y + oy, Palette.FLAME)
 
 ## The drifting cloud layer, kept out of the static plate so it can scroll.
 ## Wraps seamlessly at x = BG_W, so the view can tile two copies and slide them.

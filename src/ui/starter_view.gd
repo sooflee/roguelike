@@ -14,6 +14,14 @@ var still := false
 ## Applied to the SPRITE, not to this Control. A Control turns about its
 ## top-left corner, so rotating the panel swings the sprite off across the
 ## screen instead of tipping it over where it stands.
+## Shifts the sprite within its Control. Set it to the negative of the art's
+## offset inside its cell and the ART centres, rather than the mostly-empty
+## cell centring around it.
+var content_offset := Vector2.ZERO:
+	set(v):
+		content_offset = v
+		_place()
+
 var sprite_rotation := 0.0:
 	set(v):
 		sprite_rotation = v
@@ -49,7 +57,7 @@ func setup(texture: Texture2D, scale_to: float = 3.0) -> void:
 func _place() -> void:
 	if _sprite == null:
 		return
-	_sprite.position = Vector2(size.x * 0.5, size.y * 0.5)
+	_sprite.position = Vector2(size.x * 0.5, size.y * 0.5) + content_offset
 	_sprite.rotation = sprite_rotation
 
 func _process(delta: float) -> void:
@@ -57,7 +65,8 @@ func _process(delta: float) -> void:
 		return
 	_time += delta
 	_bob += delta
-	_sprite.position = Vector2(size.x * 0.5, size.y * 0.5 + roundf(sin(_bob * 1.6) * 3.0))
+	_sprite.position = Vector2(size.x * 0.5, size.y * 0.5 + roundf(sin(_bob * 1.6) * 3.0)) \
+		+ content_offset
 	if _frames <= 1:
 		return
 	if _time < 1.0 / 12.0:

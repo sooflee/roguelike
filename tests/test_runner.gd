@@ -126,12 +126,13 @@ func test_damage_pipeline_order() -> void:
 	eq(c.player.calculate_damage(6, e), 6, "strength applies before weak")
 
 ## The genre's defining rule. It resolves AFTER the additive and multiplicative
-## status modifiers, so a super-effective hit doubles the number the player can
-## already see rather than some intermediate value they cannot.
+## status modifiers, so the adjustment lands on the number the player can already
+## see -- and it is FLAT, so the matchup is worth the same on a cheap card as on
+## an expensive one rather than scaling with the hit.
 func test_type_effectiveness_resolves_last() -> void:
-	eq(Element.multiplier(Element.Kind.FIRE, Element.Kind.GRASS), 2.0, "fire burns grass")
-	eq(Element.multiplier(Element.Kind.FIRE, Element.Kind.WATER), 0.5, "water smothers fire")
-	eq(Element.multiplier(Element.Kind.NORMAL, Element.Kind.FIRE), 1.0, "most matchups are neutral")
+	eq(Element.bonus(Element.Kind.FIRE, Element.Kind.GRASS), 2, "fire burns grass")
+	eq(Element.bonus(Element.Kind.FIRE, Element.Kind.WATER), -2, "water smothers fire")
+	eq(Element.bonus(Element.Kind.NORMAL, Element.Kind.FIRE), 0, "most matchups are neutral")
 
 	var c := _combat(["cinder_rat"], ["strike"])
 	c.start()
@@ -143,15 +144,25 @@ func test_type_effectiveness_resolves_last() -> void:
 	e.element = Element.Kind.WATER
 	var resisted := attacker.calculate_damage(10, e, true, Element.Kind.FIRE)
 	var neutral := attacker.calculate_damage(10, e, true, Element.Kind.NORMAL)
-	eq(supered, 20, "super effective doubles")
-	eq(resisted, 5, "resisted halves")
+	eq(supered, 12, "super effective adds 2")
+	eq(resisted, 8, "resisted takes 2 away")
 	eq(neutral, 10, "a neutral matchup is unchanged")
 
+	# Floored, not negative: a resisted hit smaller than the penalty does
+	# nothing at all rather than healing the target.
+	e.element = Element.Kind.WATER
+	eq(attacker.calculate_damage(1, e, true, Element.Kind.FIRE), 0,
+		"a resisted hit cannot go below zero")
+	# Immunity is not a big negative that a large hit punches through.
+	e.element = Element.Kind.STEEL
+	eq(attacker.calculate_damage(40, e, true, Element.Kind.POISON), 0,
+		"steel is immune to poison at any size")
+
 	# Untyped damage -- an enemy move, a relic, self-damage -- skips the chart
-	# entirely rather than counting as Normal, which would silently halve it.
+	# entirely rather than counting as Normal, which would silently dock it 2.
 	e.element = Element.Kind.ROCK
 	eq(attacker.calculate_damage(10, e, true), 10, "untyped damage ignores the chart")
-	eq(attacker.calculate_damage(10, e, true, Element.Kind.NORMAL), 5,
+	eq(attacker.calculate_damage(10, e, true, Element.Kind.NORMAL), 8,
 		"but an explicitly Normal move is resisted by Rock")
 
 func test_block_absorption() -> void:

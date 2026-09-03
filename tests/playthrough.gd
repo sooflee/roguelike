@@ -150,6 +150,15 @@ func _process(_delta: float) -> void:
 		_done()
 		return
 
+	# The map is driven through the map view, not through buttons: its docked
+	# list of node buttons was removed, and clicking a node is what a player
+	# actually does.
+	if here == RUN_SCREEN.Screen.MAP and screen._map_view != null \
+			and is_instance_valid(screen._map_view) \
+			and not screen._map_view.available.is_empty():
+		screen._map_view.node_chosen.emit(screen._map_view.available[0])
+		return
+
 	# Every screen must offer something to press, or the run is stuck.
 	var buttons := _live_buttons()
 	if buttons.is_empty():

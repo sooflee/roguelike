@@ -75,7 +75,7 @@ to write off the debt, one greedy turn just loses the next one.
 
 | Stat | Value |
 |---|---|
-| Player HP | 75 |
+| Player HP | 60 |
 | Mana | 1 on turn 1, +1/turn, cap 5 |
 | Hand size | 5 |
 | Max hand | 10 |
@@ -140,7 +140,7 @@ stops offering a choice, because everything reaches everything.
 
 | Content | Count |
 |---|---|
-| Cards | 31 (3 starter, 12 common, 12 uncommon, 4 rare) |
+| Cards | 61 (3 starter, 22 common, 24 uncommon, 12 rare) |
 | Enemies | 12 normal, 2 elite, 1 boss |
 | Encounters | 4 easy, 7 normal, 3 elite, 1 boss |
 | Statuses | 9 (Strength, Dexterity, Vulnerable, Weak, Frail, Kindling, Afterburn, Dampened, Simmer) |
@@ -148,7 +148,7 @@ stops offering a choice, because everything reaches everything.
 | Potions | 11 (6 common, 4 uncommon, 2 rare) |
 | Events | 8, 23 choices |
 
-Target for a full Act 1 draft is ~75 cards. The 31 here cover all three archetypes end to end,
+Target for a full Act 1 draft is ~75 cards. The 61 here cover all three archetypes end to end,
 which is enough to answer the Phase 1 question: *is this fun as coloured rectangles?*
 
 ## Run economy
@@ -178,13 +178,18 @@ Real numbers come from playtesting.
 touches Ramp or Overload and a bot that plays the class as intended, and the gap between them is
 the only machine-checkable evidence about the class mechanic.
 
-**Read that gap with care since D-27.** At 40 runs on fixed seeds:
+**Read that gap with care since D-27.** Measured at 60 runs on the fixed seed set, against the
+current build (60 HP, additive type effectiveness, boss 120):
 
-| Policy | Reaches boss | Kills boss | Mana borrowed | Turns in debt |
-|---|---|---|---|---|
-| greedy | 100% | 65% | 282 | 32% |
-| curve-blind (never ramps or overloads) | 100% | 62.5% | 0 | 0% |
-| curve-aware | 95% | 45% | 520 | 58% |
+| Policy | Kills boss | Ramp plays that do nothing | Avg unspent Mana |
+|---|---|---|---|
+| greedy | 25.0% | 55.8% | 0.38 |
+| curve-blind (never ramps or overloads) | — | 0% | — |
+| curve-aware | — | — | — |
+
+Only `greedy` has been re-measured since the effectiveness and HP changes; the other two policies'
+last figures predate both and are not reproduced here rather than quoted stale. The session's
+trajectory on `greedy` was 33.3% → 41.7% (additive effectiveness) → 25.0% (player HP 75 → 60).
 
 Curve-aware losing to curve-blind is **not** evidence the class is worthless. Overload's value is
 entirely *what does this borrow unlock, and is that worth the interest* — and no policy in the
@@ -196,10 +201,13 @@ What the numbers do establish is that **there is now a wrong way to play Overloa
 harness can detect it. Before D-27 nothing was punished, so no bot could be wrong. Demonstrating
 a *right* way needs either a bot that evaluates cards or the human playtest D-18 is waiting on.
 
-The other thing these numbers say plainly: **Act 1 is soft.** A greedy bot reaches the boss on
-100% of runs and kills it on 65%. That was true before this work and is unchanged by it — the
-enemy additions raise the ceiling on how badly a fight can be misplayed, not the floor. Retuning
-is `docs/proposals/balance-baseline.md`'s job, not this change's.
+The other thing these numbers say plainly: **the act is decided in one fight.** A greedy bot
+reaches the boss on almost every run and the boss then kills 38 of 44 arrivals; everything else in
+the act kills 7. Three separate levers were measured against this and all three moved only the
+boss — the pre-boss campfire moved a row earlier (no change to kill rate), the rest heal cut from
+0.3 to 0.2 (−3 points), and player HP cut to 60 (−16.7). Boss HP is the lever that has not been
+swept. `docs/proposals/balance-baseline.md` predates D-27 and D-28; its three structural findings
+still reproduce, its headline win rate does not.
 
 ## Not yet built
 

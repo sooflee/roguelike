@@ -22,6 +22,7 @@ var current_event: Dictionary = {}
 var _pending_rewards: Array = []
 
 var _stats: StatStrip
+var _clock: Label
 var _body: VBoxContainer
 var _footer: RichTextLabel
 var _chrome: Control
@@ -33,6 +34,7 @@ var _ending_view: EndingView = null
 var _combat_panel: Control
 var _map_view: Node2D
 var _event_scene: EventScene = null
+var _coins: Control = null
 
 func _ready() -> void:
 	# Set once, at the top level, so every screen inherits it.
@@ -90,6 +92,21 @@ func _build_chrome() -> void:
 	_stats = StatStrip.new()
 	root.add_child(_stats)
 
+	# Top right, outside the padded column, so it sits in the corner rather than
+	# in the flow of the vitals. Anchored to the frame, not to the chrome.
+	_clock = Label.new()
+	_clock.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_clock.position = Vector2(-96, 10)
+	_clock.size = Vector2(84, 20)
+	_clock.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_clock.add_theme_font_size_override("font_size", 14)
+	_clock.add_theme_color_override("font_color", Palette.INK_MID)
+	_clock.add_theme_color_override("font_outline_color", Palette.OUTLINE)
+	_clock.add_theme_constant_override("outline_size", 4)
+	_clock.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_clock)
+	set_process(true)
+
 	_relic_strip = RelicStrip.new()
 	root.add_child(_relic_strip)
 
@@ -116,6 +133,20 @@ func _build_chrome() -> void:
 	_footer.custom_minimum_size = Vector2(0, 40)
 	root.add_child(_footer)
 
+## The run clock. Counts while a run is live and stops on the title and the
+## ending, where there is no run to time.
+func _process(delta: float) -> void:
+	if _clock == null:
+		return
+	var live: bool = run != null and _title_view == null and _ending_view == null
+	_clock.visible = live
+	if not live:
+		return
+	run.elapsed_seconds += delta
+	var total := int(run.elapsed_seconds)
+	_clock.text = "%d:%02d" % [total / 60, total % 60] if total < 3600 \
+		else "%d:%02d:%02d" % [total / 3600, (total / 60) % 60, total % 60]
+
 func _clear_body() -> void:
 	_focus_target = null
 	for c in _body.get_children():
@@ -129,9 +160,19 @@ func _clear_body() -> void:
 	if _map_view and is_instance_valid(_map_view):
 		_map_view.queue_free()
 		_map_view = null
+	# Whatever row Shift was flipping is gone with the body.
+	_upgrade_picker = null
 	if _event_scene and is_instance_valid(_event_scene):
 		_event_scene.queue_free()
 		_event_scene = null
+	# Coins in flight belong to the screen that threw them. Left alone they
+	# rain down over whatever the player opened next.
+	if _coins and is_instance_valid(_coins):
+		_coins.queue_free()
+		_coins = null
+	# Only the dressed screens centre their exit actions, so the default has to
+	# come back or the map inherits a centred "Discard an item".
+	_actions.alignment = BoxContainer.ALIGNMENT_BEGIN
 
 func _button(text: String, cb: Callable, disabled: bool = false, tip: String = "") -> Button:
 	var b := Button.new()
@@ -255,13 +296,16 @@ func _show_opening_draft(left: int) -> void:
 	screen = Screen.DRAFT
 	_clear_body()
 	_refresh_header()
-	_label("[b]Take up your tools[/b]")
-	_label("[i]Pick %d more card%s before you set out. Hover one to read it in full.[/i]"
-		% [left, "" if left == 1 else "s"])
+	# Centred like every other dressed screen. The draft is the first thing a run
+	# shows and was the last one still left-aligned against the frame edge.
+	_centred(_label("[b]Take up your tools[/b]"), 20)
+	_centred(_label("[i]Pick %d more card%s before you set out.[/i]"
+		% [left, "" if left == 1 else "s"]), 15)
 	_card_choice_row(Rewards.card_choices(), func(card: Card):
 		run.add_card(card)
-		_show_opening_draft(left - 1))
+		_show_opening_draft(left - 1), true)
 	_action_button("Take none of these", func(): _show_opening_draft(left - 1))
+	_centre_actions()
 
 func _refresh_header() -> void:
 	if run == null:
@@ -295,13 +339,9 @@ func _show_map() -> void:
 	# No legend: the nodes are icons with hover tooltips, and a colour key for
 	# something the player can simply point at was pure clutter down the side of
 	# the map it was explaining.
-	for node in available:
-		# The entrance has no stage or path number -- it is what the paths come
-		# out of, so numbering it would name a stage the player never plays.
-		var where := "the way in" if node.row < 0 \
-			else "stage %d, path %d" % [node.row + 1, node.col + 1]
-		_dock_left(_button("%s\n%s" % [MapNode.label_for(node.kind), where],
-			func(): _enter(node), false, _node_hint(node.kind)))
+	# No text list of the available nodes: it sat over the map it duplicated.
+	# MapView answers the keyboard itself now -- arrows walk the reachable nodes,
+	# Enter takes one -- so removing the list cost no accessibility.
 
 	if not run.potions.is_empty():
 		_dock_left(_button("Discard an item", _show_potion_picker, false,
@@ -404,22 +444,27 @@ func _show_rewards(kind: String) -> void:
 	_clear_body()
 	_refresh_header()
 
+	# The field you just cleared, with the far platform scorched and empty. This
+	# was the one screen in the game that had definitely just had a fight on it
+	# and was the only one that showed no sign of one.
+	_dress_scene(&"victory")
+
 	var gold := Rewards.gold_for(kind)
 	run.gold += gold
 	Audio.play(&"victory", 1.0, 0.8)
-	Audio.play(&"gold", 1.1, 0.6)
-	_label("[b]Victory.[/b]  Gained [color=%s]%d gold[/color]." % [_hex(Palette.SPARK), gold])
+	# Out of the far platform, where the thing that was carrying it stood.
+	_gold_flourish(gold, Vector2(752, 416), "Victory.")
 
 	if kind == "elite":
 		var relic := Rewards.relic(run.relics)
 		if relic:
 			run.add_relic(relic)
-			_label("Obtained held item: [b]%s[/b] — %s" % [relic.title, relic.text])
+			_centred(_label("Obtained held item: [b]%s[/b] — %s" % [relic.title, relic.text]), 15)
 	elif kind == "boss":
 		var br := Rewards.boss_relic(run.relics)
 		if br:
 			run.add_relic(br)
-			_label("Obtained rare held item: [b]%s[/b] — %s" % [br.title, br.text])
+			_centred(_label("Obtained rare held item: [b]%s[/b] — %s" % [br.title, br.text]), 15)
 
 	# The card choice is drawn only after the potion is settled. Drawn together,
 	# taking a card called _finish_node() and threw the undecided potion away
@@ -431,15 +476,23 @@ func _show_rewards(kind: String) -> void:
 
 func _show_card_choice() -> void:
 	_refresh_header()
-	_label("")
-	_label("[b]Choose a card[/b]")
+	var gap := Control.new()
+	gap.custom_minimum_size.y = 6
+	_body.add_child(gap)
+	_centred(_label("[b]Choose a card[/b]"), 18)
 	_pending_rewards = Rewards.card_choices()
-	_card_choice_row(_pending_rewards, _take_card)
+	_card_choice_row(_pending_rewards, _take_card, true)
+	_centre_actions()
 	_action_button("Skip this card", func(): _finish_node())
 
 ## A row of real cards with the hover-driven upgrade preview beneath it. Shared
 ## by the opening draft and every combat reward, so the two cannot drift apart.
-func _card_choice_row(cards: Array, on_pick: Callable) -> CardPicker:
+## `centred` constrains the hint line under the row to the scene plate. The row
+## itself is already centred on the frame -- CardPicker centres its cards inside
+## whatever width it is given, and the body is the full frame -- so the plate and
+## the cards agree without touching the picker, which the smoke walk reaches into
+## by name and must stay a direct child of the body.
+func _card_choice_row(cards: Array, on_pick: Callable, centred: bool = false) -> CardPicker:
 	var picker := CardPicker.new()
 	_body.add_child(picker)
 	picker.setup(cards)
@@ -447,23 +500,20 @@ func _card_choice_row(cards: Array, on_pick: Callable) -> CardPicker:
 	picker.call_deferred("grab_focus")
 	picker.card_chosen.connect(on_pick)
 
-	# One preview line, driven by hover. An upgrade describes a card that does
-	# not exist yet, so there is nothing to draw for it -- but a stack of three
-	# preview lines under a row of three cards says nothing about which is which.
-	var idle := "[color=%s]Hover a card to see what upgrading it gives.[/color]" \
-		% _hex(Palette.INK_MUTED)
-	var preview := _label(idle)
-	picker.card_hovered.connect(func(card):
-		if card == null:
-			preview.text = idle
-			return
-		var up: String = card.upgrade_preview()
-		if up == "":
-			preview.text = "[color=%s]%s is already upgraded.[/color]" % [
-				_hex(Palette.INK_MUTED), card.title()]
-		else:
-			preview.text = "[color=%s]↳ %s+  [%d]  —  %s[/color]" % [
-				_hex(Palette.INK_MUTED), card.data.title, card.data.cost_when(true), up])
+	# Hold Shift and every card flips to its upgraded face at once -- the same
+	# gesture the forge uses, and the same renderer, so the preview cannot
+	# disagree with what upgrading actually produces. It replaced a hover-driven
+	# line of prose that described one card at a time and made you point at each
+	# in turn to compare them.
+	for c in cards:
+		var card: Card = c
+		if card.upgrade_preview() != "":
+			picker.set_alt(card, Card.new(card.data, true))
+	_upgrade_picker = picker
+	var hint := _label("[color=%s]Hold Shift to see the upgraded version.[/color]"
+		% _hex(Palette.INK_MUTED))
+	if centred:
+		_centred(hint, 14)
 	return picker
 
 ## Takes a found potion, or -- if the belt is full -- offers the trade. Telling
@@ -477,12 +527,12 @@ func _offer_potion(pot: PotionData, on_done: Callable = Callable()) -> void:
 		finish.call()
 		return
 	if run.add_potion(pot):
-		_label("Obtained item: [b]%s[/b] — %s" % [pot.title, pot.text])
+		_centred(_label("Obtained item: [b]%s[/b] — %s" % [pot.title, pot.text]), 15)
 		finish.call()
 		return
 
-	var note := _label("[color=%s]Found [b]%s[/b] — %s. All %d slots are full.[/color]"
-		% [_hex(Palette.INK_MUTED), pot.title, pot.text, RunState.POTION_SLOTS])
+	var note := _centred(_label("[color=%s]Found [b]%s[/b] — %s. All %d slots are full.[/color]"
+		% [_hex(Palette.INK_MUTED), pot.title, pot.text, RunState.POTION_SLOTS]), 15)
 	var choices: Array[Button] = []
 	var resolve := func(text: String) -> void:
 		note.text = text
@@ -496,14 +546,14 @@ func _offer_potion(pot: PotionData, on_done: Callable = Callable()) -> void:
 		# Slot number, because a belt of three Fire Potions otherwise offers
 		# three identical buttons and no way to tell them apart.
 		var same := " (the same potion)" if h.id == pot.id else ""
-		choices.append(_button("Slot %d: discard %s to take %s%s" % [
+		choices.append(_centred_button(_button("Slot %d: discard %s to take %s%s" % [
 				i + 1, h.title, pot.title, same], func():
 			run.discard_potion(h)
 			run.add_potion(pot)
 			resolve.call("Discarded %s for [b]%s[/b]." % [h.title, pot.title]),
-			false, h.text))
-	choices.append(_button("Leave %s behind" % pot.title, func():
-		resolve.call("[color=%s]Left %s behind.[/color]" % [_hex(Palette.INK_MUTED), pot.title])))
+			false, h.text)))
+	choices.append(_centred_button(_button("Leave %s behind" % pot.title, func():
+		resolve.call("[color=%s]Left %s behind.[/color]" % [_hex(Palette.INK_MUTED), pot.title]))))
 
 func _take_card(card: Card) -> void:
 	run.add_card(card)
@@ -537,13 +587,26 @@ func _show_event() -> void:
 			label += "   (%s)" % blocked
 		_centred_button(_button(label, func(): _resolve_event(idx), blocked != "", blocked))
 
-## Puts the event's scene behind the chrome: after the veil so it is not dimmed
+## Puts a named scene behind the chrome: after the veil so it is not dimmed
 ## twice, before _chrome so the words stay on top of it.
-func _dress_event() -> void:
+##
+## Not just for events any more. A campfire, a won fight and a sprung strongbox
+## are places too, and they were the screens still rendering as left-aligned
+## prose on the same flat grey veil every other screen used.
+func _dress_scene(scene: StringName) -> void:
 	_event_scene = EventScene.new()
-	_event_scene.setup(StringName(current_event.get("scene", "field")), _body)
+	_event_scene.setup(scene, _body)
 	add_child(_event_scene)
 	move_child(_event_scene, _chrome.get_index())
+
+func _dress_event() -> void:
+	_dress_scene(StringName(current_event.get("scene", "field")))
+
+## Exit actions live in a bar of their own outside the scrolling body, which on
+## a dressed screen left "Continue" adrift at the bottom-left corner of the art.
+## Centring lines it up under the plate, which grows to cover it.
+func _centre_actions() -> void:
+	_actions.alignment = BoxContainer.ALIGNMENT_CENTER
 
 ## Constrains a body row to the plate EventScene draws and centres it there.
 ## The body is full width for every other screen, which would run the prose
@@ -564,6 +627,7 @@ func _centred_button(b: Button) -> Button:
 	return b
 
 func _resolve_event(index: int) -> void:
+	var before_gold: int = run.gold
 	var lines := EventLibrary.choose(run, current_event, index)
 	_clear_body()
 	_refresh_header()
@@ -575,6 +639,13 @@ func _resolve_event(index: int) -> void:
 		_centred(_label("[i]Nothing happens.[/i]"), 15)
 	for line in lines:
 		_centred(_label("• %s" % line), 15)
+	# An event that pays out gets the same coins the treasure does. The outcome
+	# line already names the number, so there is no second tally here -- only
+	# the coins, out of the middle of the scene the player is looking at.
+	if run.gold > before_gold:
+		Audio.play(&"gold", 1.05, 0.7)
+		_coin_burst(run.gold - before_gold, Vector2(600, 452))
+	_centre_actions()
 	_action_button("Continue", func(): _finish_node())
 
 # --- shop ------------------------------------------------------------------
@@ -744,33 +815,44 @@ func _show_campfire() -> void:
 	screen = Screen.CAMPFIRE
 	_clear_body()
 	_refresh_header()
-	_label("[b]A banked fire[/b]")
-	_label("[i]Coals still live under the ash. Enough for one thing, not two.[/i]")
+	# A place you have stopped at for the night, not a menu you have opened.
+	# Dusk, a ring of stones and a fire banked down to coals -- which is what
+	# the prose has always said and what the screen never showed.
+	_dress_scene(&"campfire")
+	_centred(_label("[b]A banked fire[/b]"), 22)
+	_centred(_label("[i]Coals still live under the ash. Enough for one thing, not two.[/i]"), 15)
+	_label("")
 	var heal := run.rest_heal_amount()
 	# Promise what it will actually heal, not the full amount, or resting at
 	# 74/75 offers "heal 23 HP" and delivers 1.
 	var real_heal: int = mini(heal, run.max_hp - run.hp)
-	_button("Rest — heal %d HP" % real_heal, func():
+	_centred_button(_button("Rest — heal %d HP" % real_heal, func():
 		var healed := run.heal(heal)
 		_clear_body()
 		_refresh_header()
-		_label("You rest. [color=%s]Healed %d HP.[/color]" % [_hex(Palette.MOSS), healed])
+		# Still the same fire. Dropping back to the bare veil to report the
+		# result walked the player out of the scene mid-rest.
+		_dress_scene(&"campfire")
+		_centred(_label("[b]A banked fire[/b]"), 22)
+		_centred(_label("You rest. [color=%s]Healed %d HP.[/color]"
+			% [_hex(Palette.MOSS), healed]), 16)
+		_centre_actions()
 		_action_button("Continue", func(): _finish_node()),
-		run.hp >= run.max_hp)
-	_button("Smith — upgrade a card", _show_upgrade_picker,
+		run.hp >= run.max_hp))
+	_centred_button(_button("Smith — upgrade a card", _show_upgrade_picker,
 		run.upgradeable_cards().is_empty(),
-		"Nothing left in the deck to upgrade." if run.upgradeable_cards().is_empty() else "")
+		"Nothing left in the deck to upgrade." if run.upgradeable_cards().is_empty() else ""))
 	# Both options above can be unavailable at once -- full HP with a fully
 	# upgraded deck -- and a screen whose every control is disabled is a run the
 	# player cannot continue. There is always a way to walk on.
-	_button("Move on without resting", func(): _finish_node())
+	_centred_button(_button("Move on without resting", func(): _finish_node()))
 
 func _show_upgrade_picker() -> void:
 	_clear_body()
 	_refresh_header()
-	_label("[b]Which move should Charmander sharpen?[/b]")
-	_label("[color=%s]Hold Shift to see every upgraded version at once.[/color]"
-		% _hex(Palette.INK_MUTED))
+	_centred(_label("[b]Which move should Charmander sharpen?[/b]"), 20)
+	_centred(_label("[color=%s]Hold Shift to see every upgraded version at once.[/color]"
+		% _hex(Palette.INK_MUTED)), 13)
 	var picker := CardPicker.new()
 	# Upgrading edits a card already in the deck, so it must not fly into it.
 	picker.fly_to_deck = false
@@ -790,12 +872,17 @@ func _show_upgrade_picker() -> void:
 		card.upgrade()
 		_clear_body()
 		_refresh_header()
-		_label("[b]%s[/b] sharpened." % card.title())
+		# The forge SHELF stays undressed -- a full deck wraps to a grid wider
+		# than the plate -- but the one sharpened card it hands back does not,
+		# and that is the moment worth standing in the firelight for.
+		_dress_scene(&"campfire")
+		_centred(_label("[b]%s[/b] sharpened." % card.title()), 20)
 		var shown := CardPicker.new()
 		shown.fly_to_deck = false
 		shown.display_only = true
 		_body.add_child(shown)
 		shown.setup([card])
+		_centre_actions()
 		_action_button("Continue", func(): _finish_node()))
 	_action_button("Back", func():
 		_upgrade_picker = null
@@ -806,17 +893,172 @@ func _show_upgrade_picker() -> void:
 func _show_treasure() -> void:
 	screen = Screen.TREASURE
 	_clear_body()
+	# The whole node used to be two lines of prose and a Continue button, for
+	# what is meant to be the run finding money. It gets a sprung strongbox to
+	# have come out of, and the money comes out of it where you can see.
+	_dress_scene(&"cache")
 	var gold := Rewards.gold_for("treasure")
 	run.gold += gold
-	_label("[b]A cache in the slag[/b]")
-	_label("Gained [color=%s]%d gold[/color]." % [_hex(Palette.SPARK), gold])
+	_centred(_label("[b]A cache in the slag[/b]"), 22)
+	_centred(_label("[i]Somebody stashed this and never came back for it.[/i]"), 15)
+	_gold_flourish(gold, Vector2(648, 470))
 	if Rng.randf_in(&"rewards") < 0.5:
 		var relic := Rewards.relic(run.relics)
 		if relic:
 			run.add_relic(relic)
-			_label("Obtained held item: [b]%s[/b] — %s" % [relic.title, relic.text])
+			_centred(_label("Obtained held item: [b]%s[/b] — %s"
+				% [relic.title, relic.text]), 15)
 	_refresh_header()
+	_centre_actions()
 	_action_button("Continue", func(): _finish_node())
+
+# --- gold ------------------------------------------------------------------
+
+## Gold arriving, as a moment rather than a receipt.
+##
+## "Gained 61 gold." told the player a number and left the counter in the corner
+## to tick up on its own. Coins come out of whatever gave them up, a tally rolls
+## to meet them, and both use the same coin glyph the HUD does, so the eye can
+## follow the money from the thing that held it to the purse that now has it.
+##
+## Presentation only. run.gold was committed by the caller and the header shows
+## the true total before the first coin lands: the rules never wait on this
+## (D-13), and skipping straight past it costs the player nothing.
+func _gold_flourish(amount: int, from: Vector2, lead: String = "") -> void:
+	if amount <= 0:
+		return
+	Audio.play(&"gold", 1.05, 0.7)
+	_gold_row(amount, lead)
+	_coin_burst(amount, from)
+
+## The tally: a coin the size of the words beside it, and a number that counts.
+##
+## `lead` shares the line rather than taking one of its own. The reward screen
+## is the tightest body in the game -- three cards, a relic, a found item and a
+## hint -- and it was already scrolling its last line off the bottom before this
+## row existed, so "Victory." and its payout sit together.
+func _gold_row(amount: int, lead: String = "") -> void:
+	var row := HBoxContainer.new()
+	row.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	row.add_theme_constant_override("separation", 10)
+	_body.add_child(row)
+
+	if lead != "":
+		var head := Label.new()
+		head.add_theme_font_size_override("font_size", 24)
+		head.add_theme_color_override("font_color", Palette.INK_LIGHT)
+		head.add_theme_color_override("font_outline_color", Palette.OUTLINE)
+		head.add_theme_constant_override("outline_size", 6)
+		head.text = lead
+		row.add_child(head)
+
+	var coin := TextureRect.new()
+	coin.texture = IconArt.hud("hud_gold")
+	coin.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	coin.custom_minimum_size = Vector2(30, 30)
+	coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	row.add_child(coin)
+
+	var num := Label.new()
+	num.add_theme_font_size_override("font_size", 26)
+	num.add_theme_color_override("font_color", Palette.SPARK)
+	num.add_theme_color_override("font_outline_color", Palette.OUTLINE)
+	num.add_theme_constant_override("outline_size", 6)
+	num.text = "+%d gold" % amount
+	row.add_child(num)
+
+	# Reduce motion gets the final number immediately. A count-up nobody can see
+	# counting is just a slower way to read the same figure (D-23).
+	if Juice.intensity <= 0.0:
+		return
+	num.text = "+0 gold"
+	var t := create_tween()
+	t.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	# Guarded: _clear_body() frees the row with queue_free(), and a tween mid-roll
+	# outlives the label it is rolling by a frame.
+	t.tween_method(func(v: float):
+		if is_instance_valid(num):
+			num.text = "+%d gold" % int(round(v)),
+		0.0, float(amount), Juice.dur(0.7))
+
+## Coins out of the thing that just gave them up. Self-freeing, and dropped by
+## _clear_body() if the player leaves before they land.
+func _coin_burst(amount: int, from: Vector2) -> void:
+	if Juice.intensity <= 0.0:
+		return
+	if _coins and is_instance_valid(_coins):
+		_coins.queue_free()
+	var burst := _CoinBurst.new()
+	add_child(burst)
+	_coins = burst
+	burst.fire(from, amount)
+
+## A handful of coins thrown up out of a point and left to gravity.
+##
+## Node2D sprites would need a stage, a z_index argument with the chrome and a
+## teardown; this is one Control drawing one texture N times, which is all the
+## effect is. It draws over everything because it is added last.
+class _CoinBurst extends Control:
+	const GRAVITY := 1100.0
+	const SPRITE := 22.0
+	var _bits: Array[Dictionary] = []
+	var _tex: Texture2D
+	var _t := 0.0
+
+	func _init() -> void:
+		set_anchors_preset(Control.PRESET_FULL_RECT)
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+
+	func fire(from: Vector2, amount: int) -> void:
+		_tex = IconArt.hud("hud_gold")
+		# One coin per handful, not one per gold piece. Sixty-one sprites is
+		# confetti, and the number is already written out beside them.
+		for i in clampi(int(amount / 6.0), 7, 18):
+			_bits.append({
+				"p": from + Vector2(randf_range(-30, 30), randf_range(-12, 12)),
+				"v": Vector2(randf_range(-170, 170), randf_range(-500, -320)),
+				"scale": randf_range(0.75, 1.35),
+				"spin": randf_range(7.0, 13.0),
+				"phase": randf() * TAU,
+				"life": randf_range(0.9, 1.5),
+				"age": 0.0,
+			})
+		set_process(true)
+
+	func _process(delta: float) -> void:
+		var k := Juice.intensity
+		_t += delta
+		var live := false
+		for b in _bits:
+			b["age"] += delta
+			if float(b["age"]) >= float(b["life"]):
+				continue
+			live = true
+			b["v"] = (b["v"] as Vector2) + Vector2(0.0, GRAVITY * delta * k)
+			b["p"] = (b["p"] as Vector2) + (b["v"] as Vector2) * delta * k
+		queue_redraw()
+		if not live:
+			queue_free()
+
+	func _draw() -> void:
+		if _tex == null:
+			return
+		for b in _bits:
+			var t: float = float(b["age"]) / float(b["life"])
+			if t >= 1.0:
+				continue
+			# Out over the last third only, so they read as landing rather than
+			# as evaporating on the way up.
+			var fade: float = clampf((1.0 - t) / 0.34, 0.0, 1.0)
+			var w: float = SPRITE * float(b["scale"])
+			# Foreshortened by a fake spin: a coin edge-on is a line, which is
+			# the cheapest thing that makes a flat sprite read as turning.
+			var flat: float = absf(cos(_t * float(b["spin"]) + float(b["phase"])))
+			var half := Vector2(w * maxf(0.12, flat), w) * 0.5
+			var p: Vector2 = b["p"]
+			draw_texture_rect(_tex, Rect2(p - half, half * 2.0), false,
+				Color(Palette.WHITE, fade))
 
 # --- endings ---------------------------------------------------------------
 

@@ -116,19 +116,38 @@ static func _ridge(img: Image, rng: RandomNumberGenerator, base_y: int,
 
 # --- wordmark --------------------------------------------------------------
 
-## A 5x7 block alphabet, only the letters EMBERWRIGHT needs. The real 8px
-## bitmap font is an outstanding art asset; until it lands, the title at least
-## should not be rendered in Godot's default sans.
+## A 5x7 block alphabet. The real 8px bitmap font is an outstanding art asset;
+## until it lands, the title at least should not be rendered in Godot's default
+## sans.
+##
+## Held to one idiom so a new letter cannot quietly look like a guest: 1px
+## stems, the waist on row 3, square corners everywhere except the round
+## letters (G, O, U), which are chamfered `.###.` top and bottom. Diagonals
+## step in whole pixels and double up where M and W do -- that is what stops N
+## from reading lighter than the letters either side of it.
+##
+## Alphabetical rather than in the order the title spells: at seventeen entries
+## the title's spelling stopped being a useful index. An unknown character falls
+## back to "I", so a missing glyph shows up as a stray letter and not as a
+## crash -- check here first if the wordmark has grown an I it should not have.
 const GLYPHS := {
-	"E": ["#####", "#....", "#....", "####.", "#....", "#....", "#####"],
-	"M": ["#...#", "##.##", "#.#.#", "#...#", "#...#", "#...#", "#...#"],
+	" ": [".....", ".....", ".....", ".....", ".....", ".....", "....."],
 	"B": ["####.", "#...#", "#...#", "####.", "#...#", "#...#", "####."],
-	"R": ["####.", "#...#", "#...#", "####.", "##...", "#.#..", "#..##"],
-	"W": ["#...#", "#...#", "#...#", "#.#.#", "#.#.#", "##.##", "#...#"],
-	"I": ["#####", "..#..", "..#..", "..#..", "..#..", "..#..", "#####"],
+	"E": ["#####", "#....", "#....", "####.", "#....", "#....", "#####"],
+	"F": ["#####", "#....", "#....", "####.", "#....", "#....", "#...."],
 	"G": [".###.", "#...#", "#....", "#.###", "#...#", "#...#", ".###."],
 	"H": ["#...#", "#...#", "#...#", "#####", "#...#", "#...#", "#...#"],
+	"I": ["#####", "..#..", "..#..", "..#..", "..#..", "..#..", "#####"],
+	"K": ["#...#", "#..#.", "#.#..", "##...", "#.#..", "#..#.", "#...#"],
+	"L": ["#....", "#....", "#....", "#....", "#....", "#....", "#####"],
+	"M": ["#...#", "##.##", "#.#.#", "#...#", "#...#", "#...#", "#...#"],
+	"N": ["#...#", "##..#", "##..#", "#.#.#", "#..##", "#..##", "#...#"],
+	"O": [".###.", "#...#", "#...#", "#...#", "#...#", "#...#", ".###."],
+	"P": ["####.", "#...#", "#...#", "####.", "#....", "#....", "#...."],
+	"R": ["####.", "#...#", "#...#", "####.", "##...", "#.#..", "#..##"],
 	"T": ["#####", "..#..", "..#..", "..#..", "..#..", "..#..", "..#.."],
+	"U": ["#...#", "#...#", "#...#", "#...#", "#...#", "#...#", ".###."],
+	"W": ["#...#", "#...#", "#...#", "#.#.#", "#.#.#", "##.##", "#...#"],
 }
 
 static func wordmark(text: String) -> Texture2D:

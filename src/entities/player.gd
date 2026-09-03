@@ -41,7 +41,9 @@ var overload: int = 0
 ## Relic-set. Combat applies it; the player never sees a cost below zero.
 var discount_first_card: bool = false
 
-func _init(p_name: String = "Charmander", p_max_hp: int = 75) -> void:
+## Defaults to RunState.STARTING_HP rather than repeating it: two copies of the
+## starting HP is two places to change and one to forget.
+func _init(p_name: String = "Charmander", p_max_hp: int = RunState.STARTING_HP) -> void:
 	super(p_name, p_max_hp)
 	is_player = true
 	element = Element.Kind.FIRE
