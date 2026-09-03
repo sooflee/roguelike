@@ -21,7 +21,7 @@ var shop: Shop = null
 var current_event: Dictionary = {}
 var _pending_rewards: Array = []
 
-var _header: RichTextLabel
+var _stats: StatStrip
 var _body: VBoxContainer
 var _footer: RichTextLabel
 var _chrome: Control
@@ -87,11 +87,8 @@ func _build_chrome() -> void:
 	pad.add_child(root)
 	_chrome = pad
 
-	_header = RichTextLabel.new()
-	_header.bbcode_enabled = true
-	_header.fit_content = true
-	_header.custom_minimum_size = Vector2(0, 40)
-	root.add_child(_header)
+	_stats = StatStrip.new()
+	root.add_child(_stats)
 
 	_relic_strip = RelicStrip.new()
 	root.add_child(_relic_strip)
@@ -216,7 +213,7 @@ func _label(text: String) -> RichTextLabel:
 func _show_title() -> void:
 	screen = Screen.MAP
 	_clear_body()
-	_header.text = ""
+	_stats.clear()
 	_footer.text = ""
 	# The title owns the whole frame: the run chrome underneath it is the HUD
 	# for a run that has not started yet.
@@ -270,17 +267,9 @@ func _refresh_header() -> void:
 	if run == null:
 		return
 	_relic_strip.setup(run.relics)
-	var potion_names: Array[String] = []
-	for p in run.potions:
-		potion_names.append(p.title)
 	# The seed is a debugging handle, not player-facing information.
 	var seed_note := "   [b]Seed[/b] %d" % run.seed_value if Dev.is_enabled() else ""
-	# Relics moved out to the icon strip; the header is a fixed two lines now.
-	_header.text = "[b]HP[/b] [color=%s]%d/%d[/color]   [b]Gold[/b] [color=%s]%d[/color]   [b]Deck[/b] %d   [b]Floor[/b] %d%s\n[i]Bag:[/i] %s" % [
-		_hex(Palette.RED), run.hp, run.max_hp, _hex(Palette.SPARK), run.gold,
-		run.deck.size(), run.floors_cleared, seed_note,
-		", ".join(potion_names) if potion_names else "none",
-	]
+	_stats.refresh(run, seed_note)
 
 # --- map -------------------------------------------------------------------
 
@@ -843,9 +832,13 @@ func _show_game_over() -> void:
 	_ending_view = EndingView.new()
 	add_child(_ending_view)
 	_ending_view.setup(false, run)
+	# Death returns to the partner select, the same as victory does. 'Set out
+	# again' used to rebuild the run and drop you straight onto a route, which
+	# skipped the one screen where the next run is chosen rather than dealt.
 	_ending_view.again_requested.connect(func():
 		_close_ending()
-		_start_new_run())
+		run = null
+		_show_title())
 
 func _show_run_complete() -> void:
 	screen = Screen.RUN_COMPLETE
@@ -857,9 +850,13 @@ func _show_run_complete() -> void:
 	_ending_view = EndingView.new()
 	add_child(_ending_view)
 	_ending_view.setup(true, run)
+	# Finishing the act returns to the partner select, not straight back onto a
+	# route. Beating it is the end of something, and the next run should open on
+	# the same choice the first one did rather than dropping you mid-journey.
 	_ending_view.again_requested.connect(func():
 		_close_ending()
-		_start_new_run())
+		run = null
+		_show_title())
 
 func _close_ending() -> void:
 	if _ending_view and is_instance_valid(_ending_view):
