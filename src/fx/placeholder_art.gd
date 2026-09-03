@@ -93,6 +93,32 @@ static func for_player_snuffed() -> Texture2D:
 	_cache["player_snuffed"] = tex
 	return tex
 
+## The ink a locked roster slot is drawn in. Mid-value on purpose: near-black
+## disappears into the panel behind it, and anything brighter stops reading as
+## a shape withheld and starts reading as a design.
+const LOCKED_INK := Palette.INK_MUTED
+
+## A featureless silhouette of a partner that exists but cannot be picked yet.
+##
+## A locked slot wants a shape, not a portrait. Flattening every opaque pixel to
+## one colour drops the ramp, the eyes and the outline together, so the slot
+## says "something goes here" without spending the reveal early. `id` only seeds
+## the generator -- the same id always gives back the same silhouette, so the
+## roster does not reshuffle itself between launches.
+static func for_locked_starter(id: StringName) -> Texture2D:
+	var key := "locked:%s" % id
+	if _cache.has(key):
+		return _cache[key]
+	var img := _generate(String(id), 64).get_image().duplicate()
+	img.convert(Image.FORMAT_RGBA8)
+	for y in img.get_height():
+		for x in img.get_width():
+			if img.get_pixel(x, y).a > 0.0:
+				img.set_pixel(x, y, LOCKED_INK)
+	var tex := ImageTexture.create_from_image(img)
+	_cache[key] = tex
+	return tex
+
 ## Builds a creature silhouette on a low-res logical grid, mirrors it for
 ## bilateral symmetry (which is what makes a blob read as a creature), upscales,
 ## then shades and outlines at full resolution.

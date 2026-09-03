@@ -11,6 +11,20 @@ signal continue_requested
 const FRAME := Vector2(960, 540)
 const SPARKS := 30
 
+const SLOT := Vector2(144, 144)
+const SLOT_Y := 170.0
+const SLOT_GAP := 24.0
+
+## The roster, left to right. Only Charmander is playable; the other two are
+## drawn as locked silhouettes so the screen reads as a choice that opens up
+## later rather than as one option padded out to look like a choice. Unlocking
+## one is a `locked` flag and a real sprite, not a rewrite of this screen.
+const ROSTER := [
+	{"id": &"locked_left",  "name": "???",        "locked": true},
+	{"id": &"charmander",   "name": "CHARMANDER", "locked": false},
+	{"id": &"locked_right", "name": "???",        "locked": true},
+]
+
 var _sparks: Array[Vector3] = []
 var _time: float = 0.0
 var _has_save := false
@@ -48,10 +62,27 @@ func _ready() -> void:
 
 	_caption("Choose your partner.", 120, 15, Palette.INK_LIGHT)
 
-	# The starter. One option today, but built as a row so a second and third
-	# slot is a data change rather than a rewrite of this screen.
-	var slot := _starter_slot(Vector2(480 - 72, 170), PlaceholderArt.for_player())
-	_caption("CHARMANDER", 320, 17, Palette.BONE)
+	# Three slots, centred as a row: the playable one keeps the middle position it
+	# had when it was the only slot on the screen.
+	var row_left := 480.0 - (ROSTER.size() * SLOT.x + (ROSTER.size() - 1) * SLOT_GAP) * 0.5
+	var playable: Panel = null
+	for i in ROSTER.size():
+		var entry: Dictionary = ROSTER[i]
+		var locked: bool = entry["locked"]
+		var x := row_left + i * (SLOT.x + SLOT_GAP)
+		var tex: Texture2D = PlaceholderArt.for_locked_starter(entry["id"]) if locked \
+			else PlaceholderArt.for_player()
+		var slot := _starter_slot(Vector2(x, SLOT_Y), tex, locked)
+		_caption(entry["name"], 320, 17, Palette.INK_MUTED if locked else Palette.BONE,
+			x + SLOT.x * 0.5, SLOT.x + SLOT_GAP)
+		if locked:
+			# Inert on purpose: a locked slot must not take the highlight off the
+			# one partner that can actually set out, and must not arm Start.
+			continue
+		playable = slot
+		slot.gui_input.connect(func(e: InputEvent):
+			if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+				_select(slot))
 	_caption("Fire  ·  the only one ready to travel", 344, 13, Palette.INK_MID)
 
 	var menu := VBoxContainer.new()
@@ -63,25 +94,25 @@ func _ready() -> void:
 		_menu_button(menu, "Continue run", func(): continue_requested.emit())
 	_start_btn = _menu_button(menu, "Start", func(): new_run_requested.emit())
 	_start_btn.disabled = true
-	slot.gui_input.connect(func(e: InputEvent):
-		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
-			_select(slot))
 
 	for i in SPARKS:
 		_sparks.append(Vector3(randf() * 960.0, randf() * 540.0, 12.0 + randf() * 22.0))
 	# Pre-selected, because refusing to start until you click the only option
 	# available is a puzzle, not a choice.
-	_select(slot)
+	if playable:
+		_select(playable)
 	set_process(true)
 
-func _starter_slot(at: Vector2, tex: Texture2D) -> Panel:
+func _starter_slot(at: Vector2, tex: Texture2D, locked: bool = false) -> Panel:
 	var slot := Panel.new()
 	slot.position = at
-	slot.size = Vector2(144, 144)
+	slot.size = SLOT
 	slot.mouse_filter = Control.MOUSE_FILTER_STOP
 	var box := StyleBoxFlat.new()
-	box.bg_color = Color(Palette.GROUND, 0.55)
-	box.border_color = Palette.BORDER
+	# A locked slot sits back -- darker plate, dimmer border -- so the row still
+	# has an obvious subject rather than three things competing for the click.
+	box.bg_color = Color(Palette.GROUND, 0.78 if locked else 0.55)
+	box.border_color = Palette.SURFACE if locked else Palette.BORDER
 	box.set_border_width_all(2)
 	slot.add_theme_stylebox_override("panel", box)
 	add_child(slot)
@@ -90,6 +121,8 @@ func _starter_slot(at: Vector2, tex: Texture2D) -> Panel:
 	mon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	slot.add_child(mon)
 	mon.setup(tex, 1.3)
+	# A silhouette that bobs reads as alive and waiting, not as locked.
+	mon.still = locked
 	return slot
 
 func _select(slot: Panel) -> void:
@@ -103,15 +136,16 @@ func _select(slot: Panel) -> void:
 		_start_btn.disabled = false
 		_start_btn.call_deferred("grab_focus")
 
-func _caption(text: String, y: float, size: int, colour: Color) -> void:
+func _caption(text: String, y: float, size: int, colour: Color,
+		cx: float = 480.0, width: float = 500.0) -> void:
 	var l := Label.new()
 	l.text = text
 	l.add_theme_font_size_override("font_size", size)
 	l.add_theme_color_override("font_color", colour)
 	l.add_theme_color_override("font_outline_color", Palette.OUTLINE)
 	l.add_theme_constant_override("outline_size", 5)
-	l.position = Vector2(230, y)
-	l.size = Vector2(500, 24)
+	l.position = Vector2(cx - width * 0.5, y)
+	l.size = Vector2(width, 24)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(l)
