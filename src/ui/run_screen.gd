@@ -249,6 +249,55 @@ func _label(text: String) -> RichTextLabel:
 	_body.add_child(l)
 	return l
 
+## Matches the relic strip, which is where a held item goes to live once this
+## screen is gone. Handing it over at one size and then parking it at another
+## makes the player match them up by name instead of by sight.
+const OBTAINED_ICON := 36.0
+
+## One item the player just picked up, led by its picture.
+##
+## This used to be a sentence -- "Obtained held item: Focus Sash — At the start
+## of each combat, gain 9 Block." -- so the reward arrived as prose and the icon
+## was first met later, on the strip, with nothing connecting the two. The
+## sprite is what they will have to recognise from then on, so it goes first and
+## the words explain it rather than replace it. `kind` keeps the one distinction
+## the picture cannot carry: whether this is kept or spent.
+func _obtained_item(icon: Texture2D, title: String, kind: String, text: String) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	row.add_theme_constant_override("separation", 10)
+	_body.add_child(row)
+
+	var pic := TextureRect.new()
+	pic.texture = icon
+	pic.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	pic.custom_minimum_size = Vector2(OBTAINED_ICON, OBTAINED_ICON)
+	pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	pic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(pic)
+
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 0)
+	col.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(col)
+
+	var name_line := Label.new()
+	name_line.text = title
+	name_line.add_theme_font_size_override("font_size", 15)
+	name_line.add_theme_color_override("font_color", Palette.BONE)
+	col.add_child(name_line)
+
+	var body_line := Label.new()
+	body_line.text = "%s · %s" % [kind, text]
+	body_line.add_theme_font_size_override("font_size", 13)
+	body_line.add_theme_color_override("font_color", Palette.INK_MID)
+	# Wrapped, not clipped: a long effect line is common and the row is centred,
+	# so an unwrapped one would push the icon off its own side of the plate.
+	body_line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body_line.custom_minimum_size.x = EventScene.PLATE_W - 56.0 - OBTAINED_ICON - 10.0
+	col.add_child(body_line)
+	return row
+
 # --- run lifecycle ---------------------------------------------------------
 
 func _show_title() -> void:
@@ -459,12 +508,12 @@ func _show_rewards(kind: String) -> void:
 		var relic := Rewards.relic(run.relics)
 		if relic:
 			run.add_relic(relic)
-			_centred(_label("Obtained held item: [b]%s[/b] — %s" % [relic.title, relic.text]), 15)
+			_obtained_item(IconArt.for_relic(relic.id), relic.title, "Held item", relic.text)
 	elif kind == "boss":
 		var br := Rewards.boss_relic(run.relics)
 		if br:
 			run.add_relic(br)
-			_centred(_label("Obtained rare held item: [b]%s[/b] — %s" % [br.title, br.text]), 15)
+			_obtained_item(IconArt.for_relic(br.id), br.title, "Rare held item", br.text)
 
 	# The card choice is drawn only after the potion is settled. Drawn together,
 	# taking a card called _finish_node() and threw the undecided potion away
@@ -527,7 +576,7 @@ func _offer_potion(pot: PotionData, on_done: Callable = Callable()) -> void:
 		finish.call()
 		return
 	if run.add_potion(pot):
-		_centred(_label("Obtained item: [b]%s[/b] — %s" % [pot.title, pot.text]), 15)
+		_obtained_item(IconArt.for_item(pot.id), pot.title, "Item", pot.text)
 		finish.call()
 		return
 
@@ -906,8 +955,7 @@ func _show_treasure() -> void:
 		var relic := Rewards.relic(run.relics)
 		if relic:
 			run.add_relic(relic)
-			_centred(_label("Obtained held item: [b]%s[/b] — %s"
-				% [relic.title, relic.text]), 15)
+			_obtained_item(IconArt.for_relic(relic.id), relic.title, "Held item", relic.text)
 	_refresh_header()
 	_centre_actions()
 	_action_button("Continue", func(): _finish_node())
