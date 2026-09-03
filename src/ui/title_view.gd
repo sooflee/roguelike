@@ -103,7 +103,7 @@ func _ready() -> void:
 	_motes = motes
 
 	_wordmark()
-	_caption("Choose your partner.", 118, 15, Palette.INK_LIGHT)
+	_caption("Choose your hero.", 118, 15, Palette.INK_LIGHT)
 
 	for i in ROSTER.size():
 		var entry: Dictionary = ROSTER[i]
@@ -208,8 +208,9 @@ func _focus_on(i: int, animate: bool = true) -> void:
 		Palette.INK_MUTED if locked else Palette.BONE)
 	# Say why, rather than leaving a dead Start button to be interpreted. A
 	# control that refuses without a reason reads as a bug -- but say it
-	# without naming the partner either.
-	_hint_label.text = "This one will not travel with you yet." if locked else ""
+	# without naming the locked hero either. Not "travel with you": the roster
+	# is who the player is about to be, not who they are bringing along.
+	_hint_label.text = "This one is not ready to travel yet." if locked else ""
 
 	# Also on first arrival, and it is deliberate: two of the three ways onto
 	# this screen are the player pressing "Set out again", so the greeting is
