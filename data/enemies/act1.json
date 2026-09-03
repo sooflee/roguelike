@@ -1,0 +1,753 @@
+[
+ {
+  "id": "cinder_rat",
+  "name": "Rattata",
+  "element": "NORMAL",
+  "hp": [
+   10,
+   14
+  ],
+  "moves": [
+   {
+    "id": "tackle",
+    "intent": "ATTACK",
+    "damage": 5,
+    "weight": 3,
+    "max_consecutive": 2,
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 5,
+      "contact": true
+     }
+    ]
+   },
+   {
+    "id": "agility",
+    "intent": "DEFEND",
+    "weight": 1,
+    "effects": [
+     {
+      "type": "block",
+      "amount": 4
+     }
+    ]
+   }
+  ],
+  "height_m": 0.3
+ },
+ {
+  "id": "slag_hound",
+  "name": "Growlithe",
+  "element": "FIRE",
+  "hp": [
+   16,
+   20
+  ],
+  "moves": [
+   {
+    "id": "bite",
+    "intent": "ATTACK",
+    "damage": 7,
+    "weight": 3,
+    "max_consecutive": 2,
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 7,
+      "contact": true
+     }
+    ]
+   },
+   {
+    "id": "roar",
+    "intent": "DEBUFF",
+    "weight": 1,
+    "max_consecutive": 1,
+    "effects": [
+     {
+      "type": "status",
+      "status": "weak",
+      "stacks": 1
+     }
+    ]
+   }
+  ],
+  "height_m": 0.7
+ },
+ {
+  "id": "ash_wisp",
+  "name": "Zubat",
+  "element": "POISON",
+  "hp": [
+   8,
+   11
+  ],
+  "moves": [
+   {
+    "id": "leech_life",
+    "intent": "ATTACK_DEBUFF",
+    "damage": 4,
+    "weight": 2,
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 4,
+      "contact": true
+     },
+     {
+      "type": "status",
+      "status": "weak",
+      "stacks": 1
+     }
+    ]
+   },
+   {
+    "id": "double_team",
+    "intent": "DEFEND",
+    "weight": 2,
+    "max_consecutive": 1,
+    "effects": [
+     {
+      "type": "block",
+      "amount": 5
+     }
+    ]
+   }
+  ],
+  "height_m": 0.8
+ },
+ {
+  "id": "bellows_imp",
+  "name": "Pidgey",
+  "element": "FLYING",
+  "hp": [
+   14,
+   18
+  ],
+  "moves": [
+   {
+    "id": "double_hit",
+    "intent": "ATTACK",
+    "damage": 3,
+    "hits": 2,
+    "weight": 3,
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 3,
+      "hits": 2,
+      "contact": true
+     }
+    ]
+   },
+   {
+    "id": "hone_claws",
+    "intent": "BUFF",
+    "weight": 1,
+    "max_consecutive": 1,
+    "effects": [
+     {
+      "type": "status",
+      "status": "strength",
+      "stacks": 2,
+      "to_self": true
+     }
+    ]
+   }
+  ],
+  "height_m": 0.3
+ },
+ {
+  "id": "cracked_golem",
+  "name": "Geodude",
+  "element": "ROCK",
+  "hp": [
+   28,
+   34
+  ],
+  "moves": [
+   {
+    "id": "slam",
+    "intent": "ATTACK",
+    "damage": 11,
+    "weight": 2,
+    "max_consecutive": 1,
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 11,
+      "contact": true
+     }
+    ]
+   },
+   {
+    "id": "harden",
+    "intent": "DEFEND",
+    "weight": 2,
+    "max_consecutive": 1,
+    "effects": [
+     {
+      "type": "block",
+      "amount": 8
+     }
+    ]
+   }
+  ],
+  "opening": [
+   "harden",
+   "slam"
+  ],
+  "height_m": 0.4
+ },
+ {
+  "id": "furnace_moth",
+  "name": "Venonat",
+  "element": "POISON",
+  "hp": [
+   12,
+   15
+  ],
+  "moves": [
+   {
+    "id": "stun_spore",
+    "intent": "DEBUFF",
+    "weight": 1,
+    "max_consecutive": 1,
+    "effects": [
+     {
+      "type": "status",
+      "status": "vulnerable",
+      "stacks": 2
+     }
+    ]
+   },
+   {
+    "id": "confusion",
+    "intent": "ATTACK",
+    "damage": 6,
+    "weight": 3,
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 6
+     }
+    ]
+   }
+  ],
+  "height_m": 1.0
+ },
+ {
+  "id": "molten_glob",
+  "name": "Grimer",
+  "element": "POISON",
+  "hp": [
+   20,
+   24
+  ],
+  "moves": [
+   {
+    "id": "sludge",
+    "intent": "ATTACK",
+    "damage": 8,
+    "weight": 3,
+    "max_consecutive": 2,
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 8
+     }
+    ]
+   },
+   {
+    "id": "minimize",
+    "intent": "DEFEND",
+    "weight": 1,
+    "effects": [
+     {
+      "type": "block",
+      "amount": 7
+     }
+    ]
+   }
+  ],
+  "height_m": 0.9
+ },
+ {
+  "id": "tongsman",
+  "name": "Krabby",
+  "element": "WATER",
+  "hp": [
+   22,
+   26
+  ],
+  "moves": [
+   {
+    "id": "vice_grip",
+    "intent": "ATTACK",
+    "damage": 9,
+    "weight": 3,
+    "max_consecutive": 2,
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 9,
+      "contact": true
+     }
+    ]
+   },
+   {
+    "id": "swords_dance",
+    "intent": "BUFF",
+    "weight": 1,
+    "max_consecutive": 1,
+    "effects": [
+     {
+      "type": "status",
+      "status": "strength",
+      "stacks": 2,
+      "to_self": true
+     }
+    ]
+   }
+  ],
+  "height_m": 0.4
+ },
+ {
+  "id": "forge_warden",
+  "name": "Onix",
+  "element": "ROCK",
+  "hp": [
+   44,
+   48
+  ],
+  "moves": [
+   {
+    "id": "rock_slide",
+    "intent": "ATTACK",
+    "damage": 14,
+    "weight": 3,
+    "max_consecutive": 1,
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 14
+     }
+    ]
+   },
+   {
+    "id": "bind",
+    "intent": "ATTACK",
+    "damage": 7,
+    "hits": 2,
+    "weight": 2,
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 7,
+      "hits": 2,
+      "contact": true
+     }
+    ]
+   },
+   {
+    "id": "iron_defense",
+    "intent": "ATTACK_DEFEND",
+    "damage": 6,
+    "weight": 2,
+    "max_consecutive": 1,
+    "effects": [
+     {
+      "type": "block",
+      "amount": 12
+     },
+     {
+      "type": "damage",
+      "amount": 6
+     }
+    ]
+   }
+  ],
+  "opening": [
+   "iron_defense",
+   "bind",
+   "rock_slide"
+  ],
+  "height_m": 8.8
+ },
+ {
+  "id": "slag_titan",
+  "name": "Golem",
+  "element": "ROCK",
+  "hp": [
+   52,
+   58
+  ],
+  "moves": [
+   {
+    "id": "rollout",
+    "intent": "ATTACK",
+    "damage": 18,
+    "weight": 2,
+    "max_consecutive": 1,
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 18,
+      "contact": true
+     }
+    ]
+   },
+   {
+    "id": "magnitude",
+    "intent": "ATTACK_DEBUFF",
+    "damage": 8,
+    "weight": 3,
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 8
+     },
+     {
+      "type": "status",
+      "status": "frail",
+      "stacks": 2
+     }
+    ]
+   },
+   {
+    "id": "curse",
+    "intent": "BUFF",
+    "weight": 1,
+    "max_consecutive": 1,
+    "effects": [
+     {
+      "type": "status",
+      "status": "strength",
+      "stacks": 3,
+      "to_self": true
+     },
+     {
+      "type": "block",
+      "amount": 10
+     }
+    ]
+   }
+  ],
+  "opening": [
+   "magnitude",
+   "curse"
+  ],
+  "height_m": 1.4
+ },
+ {
+  "id": "the_bellowsmith",
+  "name": "Blastoise",
+  "element": "WATER",
+  "hp": [
+   120,
+   120
+  ],
+  "moves": [
+   {
+    "id": "rain_dance",
+    "intent": "BUFF",
+    "weight": 2,
+    "max_consecutive": 1,
+    "effects": [
+     {
+      "type": "status",
+      "status": "strength",
+      "stacks": 3,
+      "to_self": true
+     }
+    ]
+   },
+   {
+    "id": "hydro_pump",
+    "intent": "ATTACK",
+    "damage": 16,
+    "weight": 3,
+    "max_consecutive": 2,
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 16
+     }
+    ]
+   },
+   {
+    "id": "water_pulse",
+    "intent": "ATTACK_DEBUFF",
+    "damage": 10,
+    "weight": 2,
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 10
+     },
+     {
+      "type": "status",
+      "status": "vulnerable",
+      "stacks": 2
+     }
+    ]
+   },
+   {
+    "id": "skull_bash",
+    "intent": "ATTACK_DEFEND",
+    "damage": 8,
+    "hits": 2,
+    "weight": 2,
+    "max_consecutive": 1,
+    "effects": [
+     {
+      "type": "block",
+      "amount": 15
+     },
+     {
+      "type": "damage",
+      "amount": 8,
+      "hits": 2,
+      "contact": true
+     }
+    ]
+   },
+   {
+    "id": "rapid_spin",
+    "intent": "ATTACK_DEBUFF",
+    "damage": 12,
+    "weight": 4,
+    "max_consecutive": 1,
+    "tell": "dampen",
+    "condition": {
+     "type": "hp_below",
+     "value": 0.45
+    },
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 12,
+      "contact": true
+     },
+     {
+      "type": "status",
+      "status": "dampened",
+      "stacks": 2
+     }
+    ]
+   }
+  ],
+  "opening": [
+   "rain_dance",
+   "hydro_pump"
+  ],
+  "height_m": 1.6
+ },
+ {
+  "id": "coal_thief",
+  "name": "Meowth",
+  "element": "NORMAL",
+  "hp": [
+   14,
+   17
+  ],
+  "moves": [
+   {
+    "id": "pay_day",
+    "intent": "ATTACK_DEBUFF",
+    "damage": 5,
+    "weight": 3,
+    "max_consecutive": 2,
+    "tell": "siphon",
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 5,
+      "contact": true
+     },
+     {
+      "type": "drain_ramp",
+      "amount": 1
+     }
+    ]
+   },
+   {
+    "id": "screech",
+    "intent": "DEFEND",
+    "weight": 3,
+    "max_consecutive": 1,
+    "condition": {
+     "type": "hp_below",
+     "value": 0.5
+    },
+    "effects": [
+     {
+      "type": "block",
+      "amount": 8
+     }
+    ]
+   }
+  ],
+  "opening": [
+   "pay_day"
+  ],
+  "height_m": 0.4
+ },
+ {
+  "id": "damper",
+  "name": "Poliwag",
+  "element": "WATER",
+  "hp": [
+   16,
+   20
+  ],
+  "moves": [
+   {
+    "id": "water_gun",
+    "intent": "ATTACK",
+    "damage": 6,
+    "weight": 3,
+    "max_consecutive": 2,
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 6
+     }
+    ]
+   },
+   {
+    "id": "mist",
+    "intent": "DEBUFF",
+    "weight": 3,
+    "max_consecutive": 1,
+    "tell": "dampen",
+    "condition": {
+     "type": "player_overloaded"
+    },
+    "effects": [
+     {
+      "type": "status",
+      "status": "dampened",
+      "stacks": 2
+     }
+    ]
+   },
+   {
+    "id": "body_slam",
+    "intent": "ATTACK",
+    "damage": 10,
+    "weight": 2,
+    "max_consecutive": 1,
+    "tell": "feeds on debt",
+    "condition": {
+     "type": "player_overloaded"
+    },
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 10,
+      "contact": true
+     }
+    ]
+   }
+  ],
+  "height_m": 0.6
+ },
+ {
+  "id": "kiln_hound",
+  "name": "Vulpix",
+  "element": "FIRE",
+  "hp": [
+   20,
+   24
+  ],
+  "statuses": [
+   {
+    "id": "simmer",
+    "stacks": 2
+   }
+  ],
+  "moves": [
+   {
+    "id": "quick_attack",
+    "intent": "ATTACK",
+    "damage": 7,
+    "weight": 3,
+    "max_consecutive": 2,
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 7,
+      "contact": true
+     }
+    ]
+   },
+   {
+    "id": "tail_whip",
+    "intent": "DEFEND",
+    "weight": 1,
+    "max_consecutive": 1,
+    "effects": [
+     {
+      "type": "block",
+      "amount": 6
+     }
+    ]
+   }
+  ],
+  "height_m": 0.6
+ },
+ {
+  "id": "slag_shell",
+  "name": "Kabuto",
+  "element": "ROCK",
+  "hp": [
+   24,
+   28
+  ],
+  "block": 7,
+  "passives": [
+   {
+    "type": "block",
+    "amount": 7
+   }
+  ],
+  "passive_text": "Reguards 7 Block each turn",
+  "moves": [
+   {
+    "id": "scratch",
+    "intent": "ATTACK",
+    "damage": 7,
+    "weight": 3,
+    "max_consecutive": 2,
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 7,
+      "contact": true
+     }
+    ]
+   },
+   {
+    "id": "ancient_power",
+    "intent": "ATTACK",
+    "damage": 14,
+    "weight": 3,
+    "max_consecutive": 1,
+    "tell": "shell splitting",
+    "condition": {
+     "type": "hp_below",
+     "value": 0.5
+    },
+    "effects": [
+     {
+      "type": "damage",
+      "amount": 14
+     }
+    ]
+   }
+  ],
+  "height_m": 0.5
+ }
+]

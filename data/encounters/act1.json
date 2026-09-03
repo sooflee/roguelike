@@ -1,0 +1,20 @@
+[
+  {"id": "easy_rats",    "kind": "easy",   "enemies": ["cinder_rat", "cinder_rat"]},
+  {"id": "easy_hound",   "kind": "easy",   "enemies": ["slag_hound"]},
+  {"id": "easy_wisps",   "kind": "easy",   "enemies": ["ash_wisp", "cinder_rat"]},
+  {"id": "easy_thief",   "kind": "easy",   "enemies": ["coal_thief"]},
+
+  {"id": "norm_imp_pack","kind": "normal", "enemies": ["bellows_imp", "slag_hound"]},
+  {"id": "norm_golem",   "kind": "normal", "enemies": ["cracked_golem"]},
+  {"id": "norm_swarm",   "kind": "normal", "enemies": ["furnace_moth", "ash_wisp", "cinder_rat"]},
+  {"id": "norm_foundry", "kind": "normal", "enemies": ["molten_glob", "tongsman"]},
+  {"id": "norm_kennel",  "kind": "normal", "enemies": ["kiln_hound", "cinder_rat"]},
+  {"id": "norm_shell",   "kind": "normal", "enemies": ["slag_shell"]},
+  {"id": "norm_damping", "kind": "normal", "enemies": ["damper", "coal_thief"]},
+
+  {"id": "elite_warden", "kind": "elite",  "enemies": ["forge_warden"]},
+  {"id": "elite_titan",  "kind": "elite",  "enemies": ["slag_titan"]},
+  {"id": "elite_kennel", "kind": "elite",  "enemies": ["kiln_hound", "kiln_hound", "damper"]},
+
+  {"id": "boss_smith",   "kind": "boss",   "enemies": ["the_bellowsmith"]}
+]

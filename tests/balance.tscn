@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bbalance0001"]
+
+[ext_resource type="Script" path="res://tests/balance.gd" id="1_bal"]
+
+[node name="Balance" type="Node"]
+script = ExtResource("1_bal")

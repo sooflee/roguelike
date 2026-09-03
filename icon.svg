@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Emberwright. Endesga-32 palette, per docs/ART_BIBLE.md. -->
+  <rect width="128" height="128" fill="#181425"/>
+  <!-- anvil -->
+  <path d="M22 46 H106 V62 H78 L74 74 H90 V88 H38 V74 H54 L50 62 H22 L8 54 Z" fill="#8b9bb4"/>
+  <path d="M22 46 H106 V52 H22 Z" fill="#c0cbdc"/>
+  <rect x="30" y="88" width="68" height="14" fill="#5a6988"/>
+  <!-- ember: the reserved accent, used only for heat -->
+  <circle cx="64" cy="30" r="9" fill="#f77622"/>
+  <circle cx="64" cy="28" r="4" fill="#feae34"/>
+  <circle cx="44" cy="24" r="3" fill="#f77622" opacity="0.75"/>
+  <circle cx="84" cy="20" r="2" fill="#feae34" opacity="0.6"/>
+</svg>

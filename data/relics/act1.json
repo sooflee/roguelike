@@ -1,0 +1,76 @@
+[
+  {
+    "id": "forge_mark", "title": "Charcoal", "rarity": "STARTER",
+    "text": "At the start of each combat, Ramp 1.",
+    "on_combat_start": [{"type": "ramp", "amount": 1}]
+  },
+  {
+    "id": "iron_tongs", "title": "Rocky Helmet", "rarity": "COMMON",
+    "text": "At the start of each combat, gain 4 Block.",
+    "on_combat_start": [{"type": "block", "amount": 4}]
+  },
+  {
+    "id": "ash_charm", "title": "Lucky Egg", "rarity": "COMMON", "text": "Gain 8 Max HP.",
+    "bonus_max_hp": 8
+  },
+  {
+    "id": "whetstone", "title": "Muscle Band", "rarity": "COMMON",
+    "text": "At the start of each combat, gain 1 Strength.",
+    "on_combat_start": [{"type": "status", "status": "strength", "stacks": 1, "to_self": true}]
+  },
+  {
+    "id": "slag_pouch", "title": "Eviolite", "rarity": "COMMON",
+    "text": "At the start of each combat, gain 1 Dexterity.",
+    "on_combat_start": [{"type": "status", "status": "dexterity", "stacks": 1, "to_self": true}]
+  },
+  {
+    "id": "cinder_vial", "title": "Black Sludge", "rarity": "COMMON",
+    "text": "At the start of each combat, apply 1 Weak to ALL enemies.",
+    "on_combat_start": [{"type": "status", "status": "weak", "stacks": 1}]
+  },
+  {
+    "id": "spare_bellows", "title": "Leftovers", "rarity": "UNCOMMON",
+    "text": "At the start of your turn, Ramp 1.",
+    "on_turn_start": [{"type": "ramp", "amount": 1}]
+  },
+  {
+    "id": "ring_of_ash", "title": "Wide Lens", "rarity": "UNCOMMON",
+    "text": "Draw 1 additional card each turn.", "bonus_card_draw": 1
+  },
+  {
+    "id": "quench_basin", "title": "Focus Sash", "rarity": "UNCOMMON",
+    "text": "At the start of each combat, gain 9 Block.",
+    "on_combat_start": [{"type": "block", "amount": 9}]
+  },
+  {
+    "id": "governor", "title": "Choice Band", "rarity": "UNCOMMON",
+    "text": "The first card you play each turn costs 1 less PP.", "discounts_first_card": true
+  },
+  {
+    "id": "twin_hammers", "title": "Expert Belt", "rarity": "UNCOMMON",
+    "text": "At the start of each combat, gain 2 Strength.",
+    "on_combat_start": [{"type": "status", "status": "strength", "stacks": 2, "to_self": true}]
+  },
+  {
+    "id": "coal_ration", "title": "Shell Bell", "rarity": "UNCOMMON",
+    "text": "Heal 6 additional HP when you rest.", "bonus_rest_heal": 6
+  },
+  {
+    "id": "white_forge", "title": "Power Herb", "rarity": "RARE",
+    "text": "Start each combat with 2 additional PP.", "bonus_max_pp": 2
+  },
+  {
+    "id": "slack_tub", "title": "Persim Berry", "rarity": "RARE",
+    "text": "At the start of your turn, clear your Overload.",
+    "on_turn_start": [{"type": "clear_overload"}]
+  },
+  {
+    "id": "bottomless_bellows", "title": "Metronome", "rarity": "BOSS",
+    "text": "Your PP ceiling is 1 higher.", "bonus_max_pp": 1
+  },
+  {
+    "id": "smiths_lungs", "title": "Life Orb", "rarity": "BOSS",
+    "text": "Gain 12 Max HP. Draw 1 additional card each turn.", "bonus_max_hp": 12,
+    "bonus_card_draw": 1
+  }
+]

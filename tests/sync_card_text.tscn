@@ -1,0 +1,4 @@
+[gd_scene load_steps=2 format=3 uid="uid://bsynctext001"]
+[ext_resource type="Script" path="res://tests/sync_card_text.gd" id="1_s"]
+[node name="Sync" type="Node"]
+script = ExtResource("1_s")

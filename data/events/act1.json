@@ -1,0 +1,380 @@
+[
+ {
+  "id": "cold_forge",
+  "title": "The Old Training Field",
+  "text": "Rusted training machines sit in the long grass, and a punching post worn smooth by generations of Machop. Someone kept this place, once.",
+  "choices": [
+   {
+    "label": "Drill against the post",
+    "hint": "Upgrade a random move. Lose 5 HP.",
+    "requires": {
+     "upgradeable_card": true,
+     "hp_above": 5
+    },
+    "effects": [
+     {
+      "type": "upgrade_random"
+     },
+     {
+      "type": "lose_hp",
+      "amount": 5
+     }
+    ]
+   },
+   {
+    "label": "Haul the scrap away",
+    "hint": "Gain 45 gold.",
+    "effects": [
+     {
+      "type": "gold",
+      "amount": 45
+     }
+    ]
+   },
+   {
+    "label": "Leave it be",
+    "hint": "Nothing happens.",
+    "effects": []
+   }
+  ],
+  "scene": "field"
+ },
+ {
+  "id": "the_slag_pool",
+  "title": "The Steaming Spring",
+  "text": "A hot spring bubbles up between the rocks, too hot to sit in for long. Something metal glints under the surface, further down than you would like.",
+  "choices": [
+   {
+    "label": "Reach for it",
+    "hint": "Lose 9 HP. Obtain a held item.",
+    "requires": {
+     "hp_above": 9
+    },
+    "effects": [
+     {
+      "type": "lose_hp",
+      "amount": 9
+     },
+     {
+      "type": "add_relic"
+     }
+    ]
+   },
+   {
+    "label": "Soak a while",
+    "hint": "Heal 12 HP.",
+    "effects": [
+     {
+      "type": "heal",
+      "amount": 12
+     }
+    ]
+   },
+   {
+    "label": "Move on",
+    "hint": "Nothing happens.",
+    "effects": []
+   }
+  ],
+  "scene": "spring"
+ },
+ {
+  "id": "the_apprentice",
+  "title": "The Move Tutor",
+  "text": "An old trainer sits cross-legged in the shade with a notebook on his knee. He has taught this route's Pokemon for forty years, and he is not busy.",
+  "choices": [
+   {
+    "label": "Learn from him",
+    "hint": "Add Slash to your deck.",
+    "effects": [
+     {
+      "type": "add_card",
+      "card": "hammer_fall"
+     }
+    ]
+   },
+   {
+    "label": "Let him study you",
+    "hint": "Forget a random move. Gain 20 gold.",
+    "requires": {
+     "deck_above": 1
+    },
+    "effects": [
+     {
+      "type": "remove_random"
+     },
+     {
+      "type": "gold",
+      "amount": 20
+     }
+    ]
+   },
+   {
+    "label": "Walk on",
+    "hint": "Nothing happens.",
+    "effects": []
+   }
+  ],
+  "scene": "shade"
+ },
+ {
+  "id": "the_quenching_trough",
+  "title": "The Berry Tree",
+  "text": "A Sitrus tree leans over the path, heavy and unpicked. A Pidgey watches you from the branches, entirely unbothered.",
+  "choices": [
+   {
+    "label": "Eat your fill",
+    "hint": "Gain 8 Max HP.",
+    "effects": [
+     {
+      "type": "max_hp",
+      "amount": 8
+     }
+    ]
+   },
+   {
+    "label": "Pick one for later",
+    "hint": "Obtain an item.",
+    "requires": {
+     "free_potion_slot": true
+    },
+    "effects": [
+     {
+      "type": "add_potion"
+     }
+    ]
+   },
+   {
+    "label": "Leave the tree",
+    "hint": "Nothing happens.",
+    "effects": []
+   }
+  ],
+  "scene": "berry"
+ },
+ {
+  "id": "the_toll",
+  "title": "The Grunt in the Path",
+  "text": "A man in black stands square across the trail with his arms folded. There is a stolen Poke Ball on his belt and no intention of moving.",
+  "choices": [
+   {
+    "label": "Pay",
+    "hint": "Lose 60 gold. Obtain a held item.",
+    "requires": {
+     "gold": 60
+    },
+    "effects": [
+     {
+      "type": "lose_gold",
+      "amount": 60
+     },
+     {
+      "type": "add_relic"
+     }
+    ]
+   },
+   {
+    "label": "Barge past",
+    "hint": "Lose 12 HP.",
+    "requires": {
+     "hp_above": 12
+    },
+    "effects": [
+     {
+      "type": "lose_hp",
+      "amount": 12
+     }
+    ]
+   },
+   {
+    "label": "Take the long way",
+    "hint": "Nothing happens.",
+    "effects": []
+   }
+  ],
+  "scene": "path"
+ },
+ {
+  "id": "the_ash_market",
+  "title": "The Roadside Stall",
+  "text": "Berries in baskets, a handwritten price list, and a tin for coins. The owner is nowhere in sight. A Munchlax dozes beside the tin, one paw on a coin pouch.",
+  "choices": [
+   {
+    "label": "Pay the asking price",
+    "hint": "Lose 40 gold. Obtain an item and heal 8 HP.",
+    "requires": {
+     "gold": 40
+    },
+    "effects": [
+     {
+      "type": "lose_gold",
+      "amount": 40
+     },
+     {
+      "type": "add_potion"
+     },
+     {
+      "type": "heal",
+      "amount": 8
+     }
+    ]
+   },
+   {
+    "label": "Take one and go",
+    "hint": "Obtain an item. Lose 10 HP.",
+    "requires": {
+     "free_potion_slot": true,
+     "hp_above": 10
+    },
+    "effects": [
+     {
+      "type": "add_potion"
+     },
+     {
+      "type": "lose_hp",
+      "amount": 10
+     }
+    ]
+   },
+   {
+    "label": "Walk on by",
+    "hint": "Gain 25 gold. The Munchlax pushes the pouch after you.",
+    "effects": [
+     {
+      "type": "gold",
+      "amount": 25
+     }
+    ]
+   }
+  ],
+  "scene": "stall"
+ },
+ {
+  "id": "the_dead_bellows",
+  "title": "The Hiker's Pack",
+  "text": "A hiker sets his pack down and lays TMs out on a flat rock, one at a time, like he has all day. He probably does.",
+  "choices": [
+   {
+    "label": "Buy the TM",
+    "hint": "Lose 30 gold. Add Howl to your deck.",
+    "requires": {
+     "gold": 30
+    },
+    "effects": [
+     {
+      "type": "lose_gold",
+      "amount": 30
+     },
+     {
+      "type": "add_card",
+      "card": "bellows"
+     }
+    ]
+   },
+   {
+    "label": "Sell him your spares",
+    "hint": "Gain 35 gold.",
+    "effects": [
+     {
+      "type": "gold",
+      "amount": 35
+     }
+    ]
+   },
+   {
+    "label": "Say you're just passing",
+    "hint": "Nothing happens.",
+    "effects": []
+   }
+  ],
+  "scene": "rock"
+ },
+ {
+  "id": "the_long_shift",
+  "title": "Nightfall on the Route",
+  "text": "The light is going. There is a flat patch of grass here, out of the wind, and nobody would blame you for stopping. The next stretch will keep until morning.",
+  "choices": [
+   {
+    "label": "Sleep until dawn",
+    "hint": "Heal 20 HP.",
+    "effects": [
+     {
+      "type": "heal",
+      "amount": 20
+     }
+    ]
+   },
+   {
+    "label": "Train through the night",
+    "hint": "Upgrade a random move. Lose 8 HP.",
+    "requires": {
+     "upgradeable_card": true,
+     "hp_above": 8
+    },
+    "effects": [
+     {
+      "type": "upgrade_random"
+     },
+     {
+      "type": "lose_hp",
+      "amount": 8
+     }
+    ]
+   }
+  ],
+  "scene": "night"
+ },
+ {
+  "id": "the_old_workings",
+  "title": "The Old Workings",
+  "text": "A cut in the hillside, propped with beams that have gone soft, and a spoil heap the rain has been sorting for fifty years. Someone has been back recently. There is a flat stone with three things laid out on it, squared up, and nobody anywhere to ask.",
+  "scene": "workings",
+  "choices": [
+   {
+    "label": "Take the muscle band",
+    "hint": "Obtain Muscle Band.",
+    "requires": {
+     "not_relic": "whetstone"
+    },
+    "effects": [
+     {
+      "type": "add_relic",
+      "relic": "whetstone"
+     }
+    ]
+   },
+   {
+    "label": "Take the coin roll",
+    "hint": "Gain 70 gold.",
+    "effects": [
+     {
+      "type": "gold",
+      "amount": 70
+     }
+    ]
+   },
+   {
+    "label": "Take the TM and work the heap yourself",
+    "hint": "Add Rock Slide to your deck. Lose 10 HP.",
+    "requires": {
+     "hp_above": 10
+    },
+    "effects": [
+     {
+      "type": "add_card",
+      "card": "runout"
+     },
+     {
+      "type": "lose_hp",
+      "amount": 10
+     }
+    ]
+   },
+   {
+    "label": "Leave the stone as you found it",
+    "hint": "Nothing happens.",
+    "effects": []
+   }
+  ]
+ }
+]

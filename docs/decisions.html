@@ -1,0 +1,999 @@
+<title>Emberwright Decision Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap">
+
+<style>
+/* ---------------------------------------------------------------------------
+   Palette is Endesga-32 — the same 32-colour ramp the game's art bible names as
+   its candidate. The page is built from the game's own constraint.
+   Spacing is an 8px grid, matching the art bible's UI grid rule.
+   No border radius anywhere: this is a pixel-art project.
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* light */
+  --ground:      #fbfaf7;
+  --surface:     #f2f0ea;
+  --surface-2:   #e7e4dc;
+  --border:      #c0cbdc;
+  --border-firm: #8b9bb4;
+  --ink:         #181425;
+  --ink-2:       #3a4466;
+  --muted:       #5a6988;
+
+  --ember:       #be4a2f;   /* reserved: Mana, and decisions still open */
+  --ember-fill:  #f77622;
+  --quench:      #124e89;   /* locked */
+  --quench-fill: #0099db;
+  --moss:        #3e8948;   /* verified */
+  --slag:        #733e39;   /* deviation */
+
+  --step--1: 0.8125rem;
+  --step-0:  1.0625rem;
+  --step-1:  1.375rem;
+  --step-2:  1.875rem;
+  --step-3:  2.75rem;
+  --step-4:  3.75rem;
+
+  --s1: 8px;  --s2: 16px; --s3: 24px; --s4: 32px;
+  --s5: 48px; --s6: 64px; --s7: 96px; --s8: 128px;
+
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body:    "Newsreader", Georgia, "Times New Roman", serif;
+  --mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:      #181425;
+    --surface:     #201c30;
+    --surface-2:   #262b44;
+    --border:      #3a4466;
+    --border-firm: #5a6988;
+    --ink:         #ffffff;
+    --ink-2:       #c0cbdc;
+    --muted:       #8b9bb4;
+
+    --ember:       #f77622;
+    --ember-fill:  #feae34;
+    --quench:      #0099db;
+    --quench-fill: #2ce8f5;
+    --moss:        #63c74d;
+    --slag:        #b86f50;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground:      #181425;
+  --surface:     #201c30;
+  --surface-2:   #262b44;
+  --border:      #3a4466;
+  --border-firm: #5a6988;
+  --ink:         #ffffff;
+  --ink-2:       #c0cbdc;
+  --muted:       #8b9bb4;
+
+  --ember:       #f77622;
+  --ember-fill:  #feae34;
+  --quench:      #0099db;
+  --quench-fill: #2ce8f5;
+  --moss:        #63c74d;
+  --slag:        #b86f50;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink-2);
+  font-family: var(--body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: var(--s6) var(--s3) var(--s8);
+}
+
+/* --- header -------------------------------------------------------------- */
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 var(--s2);
+}
+
+h1 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: var(--step-4);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.deck {
+  font-size: var(--step-1);
+  line-height: 1.45;
+  max-width: 34em;
+  margin: var(--s3) 0 0;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.masthead {
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: var(--s5);
+  margin-bottom: var(--s5);
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) var(--s5);
+  margin-top: var(--s5);
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  font-variant-numeric: tabular-nums;
+}
+.facts div { display: flex; gap: var(--s1); align-items: baseline; }
+.facts dt { color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.facts dd { margin: 0; color: var(--ink); font-weight: 700; }
+
+/* --- shared blocks ------------------------------------------------------- */
+
+h2 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: var(--step-2);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--ink);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.section { margin-top: var(--s7); }
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--s2);
+  margin-bottom: var(--s5);
+}
+.section-head .count {
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  color: var(--muted);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+p { margin: 0 0 var(--s2); max-width: 66ch; }
+p:last-child { margin-bottom: 0; }
+
+strong { color: var(--ink); font-weight: 600; }
+
+code, .mono { font-family: var(--mono); font-size: 0.88em; }
+code {
+  background: var(--surface-2);
+  padding: 1px 5px;
+  color: var(--ink);
+}
+
+/* --- callout ------------------------------------------------------------- */
+
+.callout {
+  border: 1px solid var(--border-firm);
+  border-left: 6px solid var(--ember);
+  background: var(--surface);
+  padding: var(--s3) var(--s4);
+  margin-top: var(--s5);
+}
+.callout h3 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: var(--step-1);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0 0 var(--s2);
+}
+.callout ol { margin: 0; padding-left: 1.25em; }
+.callout li { margin-bottom: var(--s1); }
+.callout li:last-child { margin-bottom: 0; }
+
+/* --- legend -------------------------------------------------------------- */
+
+.legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--s3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: var(--s3);
+  margin-top: var(--s5);
+}
+.legend-item h4 {
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 var(--s1);
+}
+.legend-item p {
+  font-size: var(--step--1);
+  line-height: 1.5;
+  margin: 0;
+  color: var(--ink-2);
+}
+.legend-row { display: flex; align-items: center; gap: var(--s1); margin-bottom: 6px; }
+
+/* --- status chips -------------------------------------------------------- */
+
+.chip {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border: 1px solid currentColor;
+  white-space: nowrap;
+}
+.chip.locked    { color: var(--quench); }
+.chip.open      { color: var(--ember); }
+.chip.deviation { color: var(--slag); }
+.chip.verified  { color: var(--moss); }
+
+/* --- reversibility meter: literal pixel blocks --------------------------- */
+
+.meter { display: flex; gap: 3px; align-items: center; }
+.meter i {
+  width: 8px; height: 8px;
+  background: var(--border);
+  display: block;
+}
+.meter i.on { background: var(--border-firm); }
+.meter i.max { background: var(--ember); }
+.meter-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  margin-top: 6px;
+  display: block;
+}
+
+/* --- decision rows ------------------------------------------------------- */
+
+.decisions { display: flex; flex-direction: column; gap: var(--s1); }
+
+.decision {
+  display: grid;
+  grid-template-columns: 132px 1fr;
+  gap: var(--s4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: var(--s3);
+  transition: border-color 140ms ease, background 140ms ease;
+}
+.decision:hover { border-color: var(--border-firm); background: var(--surface-2); }
+
+.d-rail { display: flex; flex-direction: column; gap: var(--s2); }
+.d-id {
+  font-family: var(--mono);
+  font-size: var(--step-1);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.d-rail .chip { align-self: flex-start; }
+
+.d-title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: var(--step-1);
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  color: var(--ink);
+  margin: 0 0 var(--s2);
+  text-wrap: balance;
+}
+
+.d-field {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: var(--s2);
+  padding: 6px 0;
+  border-top: 1px solid var(--border);
+  align-items: baseline;
+}
+.d-field:first-of-type { border-top: none; padding-top: 0; }
+.d-key {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.d-val { font-size: 0.95rem; line-height: 1.55; }
+.d-val.reject { color: var(--muted); }
+.d-val.reject em { font-style: italic; color: var(--ink-2); }
+
+/* --- palette strip ------------------------------------------------------- */
+
+.swatches { display: flex; flex-wrap: wrap; gap: 0; margin-top: var(--s3); border: 1px solid var(--border); }
+.sw { width: 40px; height: 40px; }
+.palette-note {
+  font-size: var(--step--1);
+  color: var(--muted);
+  margin-top: var(--s2);
+  max-width: 66ch;
+  font-style: italic;
+}
+
+/* --- status table -------------------------------------------------------- */
+
+.table-scroll { overflow-x: auto; margin-top: var(--s3); }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 520px;
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  font-variant-numeric: tabular-nums;
+}
+th, td { text-align: left; padding: var(--s1) var(--s2); border-bottom: 1px solid var(--border); }
+th {
+  color: var(--muted);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 11px;
+  border-bottom: 1px solid var(--border-firm);
+}
+td { color: var(--ink-2); }
+td strong { color: var(--ink); }
+
+/* --- footer -------------------------------------------------------------- */
+
+footer {
+  margin-top: var(--s7);
+  border-top: 2px solid var(--ink);
+  padding-top: var(--s3);
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s4);
+  justify-content: space-between;
+}
+
+@media (max-width: 720px) {
+  .wrap { padding: var(--s5) var(--s2) var(--s7); }
+  h1 { font-size: var(--step-3); }
+  .decision { grid-template-columns: 1fr; gap: var(--s2); }
+  .d-rail { flex-direction: row; align-items: center; gap: var(--s2); flex-wrap: wrap; }
+  .d-field { grid-template-columns: 1fr; gap: 2px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+a { color: var(--quench); }
+a:focus-visible, .decision:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Decision log · updated 2 Sep 2026</p>
+  <h1>Emberwright</h1>
+  <p class="deck">Twenty-nine decisions behind a pixel-art roguelike deckbuilder — what was chosen, what was rejected, and what each one would cost to undo.</p>
+  <dl class="facts">
+    <div><dt>Phase</dt><dd>4 — juice</dd></div>
+    <div><dt>Engine</dt><dd>Godot 4.7.2</dd></div>
+    <div><dt>Tests</dt><dd>242 / 242</dd></div>
+    <div><dt>Cards</dt><dd>61</dd></div>
+    <div><dt>Open</dt><dd>3</dd></div>
+  </dl>
+</header>
+
+<div class="callout">
+  <h3>Three decisions are waiting on you</h3>
+  <ol>
+    <li><strong>D-18 — the Phase 1 gate.</strong> A full Act 1 run is playable, now with the whole animation layer running on placeholder sprites. Twenty minutes with it answers whether the Mana curve produces an interesting decision every turn. Everything downstream is gated on that answer.</li>
+    <li><strong>D-08 — the palette.</strong> Endesga-32 is the recommendation. Until a <code>.gpl</code> lands in <code>assets/palette/</code>, the conformance checker runs in dimensions-only mode and can't catch colour drift.</li>
+    <li><strong>D-11 — the class.</strong> The Emberwright exists so there was something to playtest. Swapping it is content work, not engineering work — the cost rises sharply once art is drawn against it.</li>
+  </ol>
+</div>
+
+<div class="legend">
+  <div class="legend-item">
+    <h4>Status</h4>
+    <div class="legend-row"><span class="chip locked">Locked</span></div>
+    <div class="legend-row"><span class="chip open">Open</span></div>
+    <div class="legend-row"><span class="chip deviation">Deviation</span></div>
+    <p>“Deviation” means the build departs from the plan you approved.</p>
+  </div>
+  <div class="legend-item">
+    <h4>Cost to reverse</h4>
+    <div class="legend-row">
+      <span class="meter"><i class="on"></i><i></i><i></i><i></i><i></i></span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">an afternoon</span>
+    </div>
+    <div class="legend-row">
+      <span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">a refactor</span>
+    </div>
+    <div class="legend-row">
+      <span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="max"></i></span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">start over</span>
+    </div>
+    <p>Measured from today. Several of these rise steeply once the art pass begins.</p>
+  </div>
+</div>
+
+<!-- ================= FOUNDATIONS ================= -->
+<section class="section">
+  <div class="section-head">
+    <h2>Foundations</h2>
+    <span class="count">D-01 – D-04</span>
+  </div>
+  <div class="decisions">
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-01</span>
+        <span class="chip locked">Locked</span>
+        <span><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="max"></i></span><span class="meter-label">start over</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">Roguelike deckbuilder, Slay the Spire structure</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Draft cards, climb a generated node map, turn-based card combat, permadeath. Structure deliberately faithful; the class is where the originality goes.</span></div>
+        <div class="d-field"><span class="d-key">Rejected</span><span class="d-val reject"><em>Action roguelite</em> — animation-hungry in a way a solo dev pays for daily. <em>Turn-based grid roguelike</em> — deep systems, but animation is decoration rather than substance. <em>Tactical</em> — closest runner-up.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">A deckbuilder is the one genre where the stated goals don't fight each other. Enemies are static illustrations with short idle loops, so "great animation" means card motion and UI feel — achievable solo — rather than 12-frame run cycles.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-02</span>
+        <span class="chip verified">Verified</span>
+        <span><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="max"></i></span><span class="meter-label">start over</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">Godot 4.7.2, GDScript</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Installed and running. Tweens, <code>AnimationTree</code>, <code>GPUParticles2D</code> and shaders all in the box; exports to desktop and web.</span></div>
+        <div class="d-field"><span class="d-key">Rejected</span><span class="d-val reject"><em>TypeScript + PixiJS</em> — you'd hand-build the animation system, audio bus and particle layer. <em>LÖVE</em> — lovely, but no batteries. <em>Unity</em> — heaviest iteration loop for the least benefit at this scale.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">The engine ships the exact subsystems a juice-heavy card game leans on. Nothing here needed writing from scratch.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-03</span>
+        <span class="chip locked">Locked</span>
+        <span><span class="meter"><i class="on"></i><i></i><i></i><i></i><i></i></span><span class="meter-label">an afternoon</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">One class now, commercial game as the ambition</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Build Act 1 with a single class. Architect so classes two and three are content work rather than a rewrite.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">Every card, enemy and encounter lives in JSON and is assembled from composable effects (see D-14, D-16). A second class costs design time, not engineering time.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-04</span>
+        <span class="chip locked">Locked</span>
+        <span><span class="meter"><i class="on"></i><i></i><i></i><i></i><i></i></span><span class="meter-label">an afternoon</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">No budget until wishlists justify one</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Free and CC0 tooling throughout. Spending gates on roughly 1,000 wishlists off a demo.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">It forces the Phase 1 gate (D-18) to be answered honestly. Money spent before the game is proven fun buys polish on an unproven core.</span></div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ================= ART ================= -->
+<section class="section">
+  <div class="section-head">
+    <h2>Art direction</h2>
+    <span class="count">D-05 – D-09</span>
+  </div>
+  <div class="decisions">
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-05</span>
+        <span class="chip deviation">Amended by D-29</span>
+        <span><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="meter-label">near-total redraw</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">Pixel art</h3>
+        <div class="d-field"><span class="d-key">Amended</span><span class="d-val">D-29 ships a CC0 art pack instead. Hand-drawn remains the target the bible describes and any hand-drawn PNG still wins at load, but it is no longer what ships today.</span></div>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Hand-drawn pixel art on a locked palette and a locked canvas grid.</span></div>
+        <div class="d-field"><span class="d-key">Rejected</span><span class="d-val reject"><em>Painted illustration</em> and <em>ink/woodcut</em> — both reproduce far more reliably from AI generation.</span></div>
+        <div class="d-field"><span class="d-key">Note</span><span class="d-val">Recorded honestly: I argued against this, on the grounds that it pairs badly with an AI-assisted pipeline. You reaffirmed it, so it's the decision — and D-06 resolves the conflict rather than papering over it. The consequence is real: art is now the critical path for every feature.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-06</span>
+        <span class="chip locked">Locked</span>
+        <span><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><span class="meter-label">a policy change</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">AI for reference only; every shipped pixel hand-drawn</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">AI generates concept boards, silhouettes, composition and colour studies. No AI-generated raster ships, in whole or in part.</span></div>
+        <div class="d-field"><span class="d-key">Rejected</span><span class="d-val reject"><em>AI-assisted pixel tools</em> (PixelLab, Scenario) — viable, but they'd require Steam disclosure and daily palette policing.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">Two reasons that point the same way. AI output is pseudo-pixel — off-grid, anti-aliased, palette-exploded past 200 colours — so it needs near-total redraw regardless. And Steam's <strong>17 January 2026</strong> rewrite narrowed disclosure to player-facing shipped content, explicitly exempting concept-art ideation whose output doesn't ship, plus AI code assistants. This pipeline therefore needs <strong>no AI disclosure</strong> on the store page.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-07</span>
+        <span class="chip locked">Locked</span>
+        <span><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="max"></i></span><span class="meter-label">redraw everything</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">960 × 540 base, integer-scaled</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Doubles to exactly 1920 × 1080. Viewport stretch, aspect <code>keep</code>, integer scaling on, nearest-neighbour filtering — set project-wide.</span></div>
+        <div class="d-field"><span class="d-key">Rejected</span><span class="d-val reject"><em>640 × 360</em> — cards land near 64 × 88, forcing a 5px font. Rules text readability is the known killer in pixel card games.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">Every sprite you draw is bound to this number. It is the single most expensive decision on the page to revisit.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-08</span>
+        <span class="chip open">Open</span>
+        <span><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><span class="meter-label">rises after art pass</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">A 32-colour locked palette</h3>
+        <div class="d-field"><span class="d-key">Amended</span><span class="d-val">D-29 ships sprites carrying their own palette, so locking <code>emberwright.gpl</code> would now fail every one of them. The rule drops from a conformance gate to a rule for code-drawn UI, where it still holds.</span></div>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Thirty-two colours, one <code>.gpl</code> file, no exceptions. Ember orange is <strong>reserved</strong> for the Mana gauge and the Overloaded state — nothing else may use it, so "this is the resource" always reads at a glance.</span></div>
+        <div class="d-field"><span class="d-key">Pending</span><span class="d-val">Endesga-32 recommended; DawnBringer-32 and AxulArt-32 are alternatives. Verify the licence on the individual palette page — Lospec licensing is per-palette, not site-wide.</span></div>
+        <div class="d-field"><span class="d-key">Enforced by</span><span class="d-val"><code>tools/check_art.py</code> fails any sprite containing a colour outside the file. Dimensions-only until the palette lands.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-09</span>
+        <span class="chip locked">Locked</span>
+        <span><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="meter-label">near-total redraw</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">Sprite dimensions and the 8px grid</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Enemies 64², elites 96², bosses 128², cards 96 × 132 with an 80 × 56 art window, status icons 16². Everything snaps to 8px.</span></div>
+        <div class="d-field"><span class="d-key">Also fixed</span><span class="d-val">Light source top-left on every asset. 1px outlines in a dark palette colour, never pure black. No dithering below 2px cells. Hue-shift when shading rather than darkening.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">Consistency comes from constraints written down before drawing, not discipline in the moment. Inconsistent light direction is more visible than a wrong colour.</span></div>
+      </div>
+    </article>
+
+  </div>
+
+  <div class="swatches" role="img" aria-label="The Endesga-32 palette ramp used throughout this page">
+    <span class="sw" style="background:#181425"></span><span class="sw" style="background:#262b44"></span><span class="sw" style="background:#3a4466"></span><span class="sw" style="background:#5a6988"></span><span class="sw" style="background:#8b9bb4"></span><span class="sw" style="background:#c0cbdc"></span><span class="sw" style="background:#ffffff"></span><span class="sw" style="background:#733e39"></span><span class="sw" style="background:#be4a2f"></span><span class="sw" style="background:#d77643"></span><span class="sw" style="background:#f77622"></span><span class="sw" style="background:#feae34"></span><span class="sw" style="background:#fee761"></span><span class="sw" style="background:#63c74d"></span><span class="sw" style="background:#3e8948"></span><span class="sw" style="background:#265c42"></span><span class="sw" style="background:#124e89"></span><span class="sw" style="background:#0099db"></span><span class="sw" style="background:#2ce8f5"></span><span class="sw" style="background:#e8b796"></span><span class="sw" style="background:#c28569"></span><span class="sw" style="background:#b55088"></span>
+  </div>
+  <p class="palette-note">This page is built from Endesga-32 — the same ramp D-08 recommends — and holds to the game's own rule: ember orange appears only where something is hot, which here means the Mana mechanic and the decisions still open.</p>
+</section>
+
+<!-- ================= AUDIO ================= -->
+<section class="section">
+  <div class="section-head">
+    <h2>Audio</h2>
+    <span class="count">D-10</span>
+  </div>
+  <div class="decisions">
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-10</span>
+        <span class="chip locked">Locked</span>
+        <span><span class="meter"><i class="on"></i><i></i><i></i><i></i><i></i></span><span class="meter-label">an afternoon</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">Licensed library now, commissioned composer later</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Phase 1 on CC0 and royalty-free sources: Kenney (CC0, no attribution), the Sonniss GDC 2026 bundle (7.47 GB, unlimited projects, lifetime), OpenGameArt and Pixabay filtered to CC0.</span></div>
+        <div class="d-field"><span class="d-key">Rejected</span><span class="d-val reject"><em>AI-generated music</em> — commercial rights vary sharply by service, it would trigger Steam disclosure, and OST quality is a recurring review complaint. <em>Commissioning now</em> — right call later, wrong call before the game is proven.</span></div>
+        <div class="d-field"><span class="d-key">Hard rule</span><span class="d-val">“Royalty-free” is not “free to embed in a game.” Many standard tiers cap copies or exclude game embedding outright. Every file gets a licence row in <code>assets/audio/LICENSES.md</code> at download time, not later.</span></div>
+        <div class="d-field"><span class="d-key">First five</span><span class="d-val">Card draw, card play, hit impact, block gain, intent reveal. Deckbuilders live or die on these.</span></div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ================= CLASS ================= -->
+<section class="section">
+  <div class="section-head">
+    <h2>The class</h2>
+    <span class="count">D-11 – D-12 · D-27 – D-28</span>
+  </div>
+  <div class="decisions">
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-11</span>
+        <span class="chip open">Open</span>
+        <span><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><span class="meter-label">content, not code</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">The Emberwright, built on a Mana curve with Ramp and Overload</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Mana is the cost of every card and the class's whole identity. It opens at 1, climbs by one a turn to a cap of 5, and the class breaks that curve two ways: <strong>Ramp N</strong> permanently raises the refill and grants nothing the turn it is played; <strong>Overload N</strong> hands you Mana now against a debt that shortens every refill until it is paid off. Cards marked <strong>Overloaded:</strong> pay a bonus for as long as you carry that debt. The repayment schedule is D-27, which amended this entry.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">Ramp and Overload pull opposite ways on one dial, so every turn asks the same legible question — spend now, invest for later, or borrow against later? Ramp is strongest on turn one and worthless at the cap; Overload is always available and always charges. Neither is ever the automatic answer. And it <em>is</em> a visual: pips that light, spend and lock, an alarm strike-through sizing next turn's shortfall, embers while in debt.</span></div>
+        <div class="d-field"><span class="d-key">Archetypes</span><span class="d-val">Arrive early (ramp on turn one), Burst and pay (overload into an unanswerable turn), Cash out (<code>vent</code>/<code>temper</code> turn leftover Mana into damage or Block). <code>afterburn</code> bridges the last two by rewarding the <em>act</em> of borrowing rather than the size of the debt; <code>quench</code> is the release valve that makes the burst archetype draftable at all.</span></div>
+        <div class="d-field"><span class="d-key">Not chosen</span><span class="d-val reject"><em>A Heat gauge</em> — the original proposal: a 0–10 bar with a Stoked threshold at 6 and an Overheat penalty at 10. It was a second resource sitting beside a flat 3 energy. Folding the identity into the resource the game already had removes a bar from the HUD and makes every card cost part of the mechanic rather than a tax paid before it. Retired before it was ever playtested, so nothing was learned from it — but the class has now had two identities and neither has passed D-18.</span></div>
+        <div class="d-field"><span class="d-key">Status</span><span class="d-val">A proposal, built so there was something to playtest. Your call.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-12</span>
+        <span class="chip locked">Locked</span>
+        <span><span class="meter"><i class="on"></i><i></i><i></i><i></i><i></i></span><span class="meter-label">an afternoon</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">Baseline numbers</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">75 HP · Mana 1→5 · draw 5 · starting deck of 3 Strike, 1 Defend, 1 Kindle — five cards. Act 1 enemies 8–34 HP, elites 44–58, boss 120.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">Spire-adjacent on purpose, so playtest signal is about the Mana curve rather than about tuning noise.</span></div>
+        <div class="d-field"><span class="d-key">Unresolved</span><span class="d-val">The enemy numbers were tuned against a flat 3 energy. A curve opening on 1 makes the first two turns markedly harder: autoplay went from 3 of 6 runs reaching the boss to 2 of 6 on the same seeds. <strong>Unretuned — this is the first thing to measure.</strong></span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-27</span>
+        <span class="chip verified">Verified</span>
+        <span><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><span class="meter-label">a refactor</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">Overload is a debt that carries interest</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Overload N hands over N Mana and adds N to a debt. Every refill is reduced by the <strong>whole outstanding debt</strong>, and only <strong>one point</strong> is written off per turn — so borrowing N costs N + (N−1) + … + 1: 1 costs 1, 2 costs 3, 3 costs 6, 4 costs 10. <code>Overloaded:</code> clauses read the debt, so they stay live for as many turns as it runs.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">The original rule charged the debt once and wiped it — N Mana now for exactly N Mana next turn. That is a loan at nought per cent, and a loan at nought per cent is always worth taking, so the mechanic the class is named for asked no question. Charging interest makes the <em>size</em> of a borrow a real decision, because the cost curves up sharply while the benefit does not.</span></div>
+        <div class="d-field"><span class="d-key">Knock-on</span><span class="d-val">Carrying debt is now a <strong>stance you pay rent on</strong> rather than a one-turn combo: a debt of 3 keeps every <code>Overloaded:</code> card live for three turns and costs six Mana. That gives <code>quench</code>, <code>slack_tub</code> and <code>quenching_oil</code> a job — writing the debt off also switches the payoffs off. Zero-cost cards stop a deep debt producing a blank turn, which gives <code>ember_jab</code> and <code>flare</code> a role they did not have.</span></div>
+        <div class="d-field"><span class="d-key">Not chosen</span><span class="d-val reject"><em>Paying down half the debt each turn</em> — gentler, but the interest curve flattens exactly where the interesting risk lives (3 costs 4 instead of 6), and "half, rounded down" is harder to hold in your head mid-turn than "one a turn".</span></div>
+        <div class="d-field"><span class="d-key">Cost</span><span class="d-val"><code>last_ember</code> retuned from Overload 4 (now a ten-Mana bill) to Overload 3. The Mana gauge had to change with it: the debt no longer vanishes when charged, so it draws the refill the debt is eating and states how many turns are left to run.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-28</span>
+        <span class="chip verified">Verified</span>
+        <span><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><span class="meter-label">a refactor</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">Enemies are puzzles, expressed as data</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Three levers, all in JSON: <strong>opening</strong> (a fixed move sequence on the first turns), <strong>condition</strong> (a move only legal in a visible state of the fight — HP threshold, turn number, whether the player is carrying debt) and <strong>passives</strong> (effects resolved at the start of its turn regardless of intent). Moves may also carry a <strong>tell</strong>, a short phrase rendered on the intent line.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">Every Act 1 enemy was one attack move and one block-or-buff move behind a weighted die. Nothing in the roster ever made the player change plan: you read the intent to price your Block and played your best cards in descending order. The enemies that make Act 1 of a deckbuilder memorable each impose a small rule that invalidates the default line — and none of ours did.</span></div>
+        <div class="d-field"><span class="d-key">The real gap</span><span class="d-val">Nothing in the roster interacted with Ramp or Overload at all, so the class mechanic was purely self-facing and Ramp was only ever a greed play. <code>Coal Thief</code> drains the refill itself; <code>Damper</code> gates its worst moves on the player carrying debt. Both halves of the curve are now things the <em>fight</em> argues with.</span></div>
+        <div class="d-field"><span class="d-key">Not chosen</span><span class="d-val reject"><em>Hard-coding behaviours in GDScript subclasses</em> — faster for the first enemy, worse for the twentieth. It would also put enemy rules outside the JSON that D-14 says content lives in, and outside the integrity test that now checks every opening names a real move and every condition names one the engine evaluates.</span></div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ================= ARCHITECTURE ================= -->
+<section class="section">
+  <div class="section-head">
+    <h2>Architecture</h2>
+    <span class="count">D-13 – D-17</span>
+  </div>
+  <div class="decisions">
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-13</span>
+        <span class="chip verified">Verified</span>
+        <span><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="max"></i></span><span class="meter-label">start over</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">The simulation never awaits the view</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val"><code>Combat</code> resolves state instantly and synchronously, pushing <code>VisualEvent</code> records onto a queue. The view drains that queue and animates at whatever speed it likes.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">This is the decision that makes "great animations" achievable rather than a bug farm. Interleave the two — <code>await tween</code> inside damage calculation — and you get race conditions, unskippable animations, corrupt saves and untestable combat.</span></div>
+        <div class="d-field"><span class="d-key">Proof</span><span class="d-val">49 assertions run headlessly with no display attached. That's only possible because the rules engine has no nodes in it. Animations can also be sped up or skipped wholesale, which matters on a hundredth run.</span></div>
+        <div class="d-field"><span class="d-key">Warning</span><span class="d-val">Retrofitting this is a rewrite. It's baked in from the first commit for exactly that reason.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-14</span>
+        <span class="chip deviation">Deviation</span>
+        <span><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><span class="meter-label">a converter script</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">Content in JSON, not Godot <code>.tres</code> resources</h3>
+        <div class="d-field"><span class="d-key">Departs from</span><span class="d-val">The approved plan specified <code>.tres</code>. This is the one place the build diverges from what you signed off.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">Hand-writing <code>.tres</code> with nested <code>Array[CardEffect]</code> sub-resources is error-prone, unreadable in a diff, and can't be loaded in a headless test without the editor. JSON is reviewable, editable outside Godot, and testable.</span></div>
+        <div class="d-field"><span class="d-key">Kept open</span><span class="d-val">The runtime objects are still <code>Resource</code>s, so a <code>.tres</code> pipeline remains possible later without touching a line of effect code.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-15</span>
+        <span class="chip verified">Verified</span>
+        <span><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span><span class="meter-label">a refactor</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">Independent named RNG streams</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Separate generators for map, shuffle, rewards, shop, events, enemy AI and cosmetics — each seeded from a hash of the run seed and the stream name.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">Share a stream and drawing one extra card changes the map. Runs stop being reproducible, seeded bug reports become worthless, and daily seeds are impossible. Godot's <code>Array.shuffle()</code> uses the global RNG, so it's banned here.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-16</span>
+        <span class="chip verified">Verified</span>
+        <span><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span><span class="meter-label">a refactor</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">Cards are arrays of composable effects</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Twelve effect types — damage, block, status, draw, mana, ramp, overload, clear_overload, spend_mana, heal, conditional, add_card — each resolving against a shared context. Overloaded is a <code>conditional</code> wrapper, not a special case in the resolver.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">Adding a card is a data edit. A new condition costs one match arm. Enemies run the same effect objects the player does, so combat rules exist in exactly one place.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-17</span>
+        <span class="chip verified">Verified</span>
+        <span><span class="meter"><i class="on"></i><i></i><i></i><i></i><i></i></span><span class="meter-label">an afternoon</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">An act is 8 stages, read left to right, and the last stage is the boss</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Seven generated stages of seven lanes, plus the boss. Four seeded paths walked forward, drifting at most one lane per step; crossing edges rejected. Stage 0 always Combat, stage 3 always Treasure, stage 6 always Campfire, stage 7 the boss.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">Shortened so a whole run is playable in one sitting — which is what makes the D-18 fun gate answerable at all, since nobody judges a mechanic they never finished a run with. Four paths rather than six because seven stages at width seven fills nearly every cell and choice degrades into noise. Left to right because a journey reads as a journey, and on a 960×540 frame depth belongs on the long axis.</span></div>
+        <div class="d-field"><span class="d-key">Unresolved</span><span class="d-val">The shortening invalidated numbers it did not touch: half the nodes means half the attrition, gold and deck growth, against enemies tuned for the old length. Autoplay went from 2 of 6 runs reaching the boss to 5 of 6, and 2 of 6 killing it. A retuning proposal exists; none of it is applied.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-24</span>
+        <span class="chip verified">Verified</span>
+        <span><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><span class="meter-label">a refactor</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">Card text is generated from the effects; the authored copy is a checked mirror</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val"><code>CardData.describe(upgraded)</code> builds a card's text by asking each effect to describe itself. The authored <code>text</code> in JSON stays, and a test asserts the two agree exactly for all 31 cards at base rank.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">An upgraded card has to be readable before it exists — on the reward screen, and at the campfire where the player is deciding whether to spend the upgrade at all. Generating the text means it cannot disagree with the effects; keeping the authored copy means the prose stays good, and gives the drift test something to pin the generator against.</span></div>
+        <div class="d-field"><span class="d-key">Not chosen</span><span class="d-val reject"><em>A second authored <code>upgraded_text</code> per card</em> — 31 more strings to keep in sync with numbers that move during tuning, and the failure is silent: the card reads 6 and hits for 9.</span></div>
+        <div class="d-field"><span class="d-key">Detail</span><span class="d-val">Building it surfaced a live bug — every card in hand drew its base text, so an upgraded Strike+ read "Deal 6 damage" while dealing 9 — and two cards whose text was wrong rather than vague. "Stoked: deal 3 more" was a <em>separate</em> hit that re-runs the damage pipeline, so with Strength it beats +3 on one hit.</span></div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ================= RUN LOOP ================= -->
+<section class="section">
+  <div class="section-head">
+    <h2>Run loop</h2>
+    <span class="count">D-20 – D-21, D-25</span>
+  </div>
+  <div class="decisions">
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-20</span>
+        <span class="chip verified">Verified</span>
+        <span><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><span class="meter-label">a save migration</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">The map is derived from the seed, never serialised</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">A save stores the run seed, the current node key, and the RNG stream <em>cursors</em> — not the map itself. The map is regenerated on load.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">A stored map can disagree with the generator; a derived one cannot. Storing cursors as well as the seed matters separately: restoring only the seed would rewind every stream to the start of the run, so a reloaded save would re-roll rewards the player has already seen.</span></div>
+        <div class="d-field"><span class="d-key">Rests on</span><span class="d-val">Only safe because map generation draws from its own RNG stream — see D-15. Round-trip asserted in tests.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-21</span>
+        <span class="chip locked">Locked</span>
+        <span><span class="meter"><i class="on"></i><i></i><i></i><i></i><i></i></span><span class="meter-label">an afternoon</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">Potions are free, and playable at any point in your turn</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">No Mana cost, no once-per-turn limit. Three slots.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">Potions are the deckbuilder's safety valve — the thing that lets a player survive a draw that betrayed them. Charging Mana turns them into slightly worse cards, which removes the reason the category exists. The constraint is slot scarcity, not cost.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-25</span>
+        <span class="chip verified">Verified</span>
+        <span><span class="meter"><i class="on"></i><i></i><i></i><i></i><i></i></span><span class="meter-label">an afternoon</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">Event choices declare what the run must already have</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">A choice may carry a <code>requires</code> block — <code>gold</code>, <code>hp_above</code>, <code>deck_above</code>, <code>upgradeable_card</code>, <code>free_potion_slot</code>, <code>relic</code>. Unmet, the option is shown greyed with its reason.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val"><code>lose_gold</code> takes only what is there, so "Lose 60 gold. Obtain a relic." handed a broke player a free relic — the same hole in three of the eight events. Requirements close it in data rather than as a special case per event, and they stop an event killing anyone: a choice that costs HP is offered only while you can survive it.</span></div>
+        <div class="d-field"><span class="d-key">Detail</span><span class="d-val">Enforced in the rules layer, not only in the screen — a gate the UI owns is only as strong as the screen drawing it. No run state may lock <em>every</em> choice of an event, asserted against a deliberately destitute run rather than trusted.</span></div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ================= PRESENTATION ================= -->
+<section class="section">
+  <div class="section-head">
+    <h2>Presentation</h2>
+    <span class="count">D-22 – D-23</span>
+  </div>
+  <div class="decisions">
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-22</span>
+        <span class="chip verified">Verified</span>
+        <span><span class="meter"><i class="on"></i><i></i><i></i><i></i><i></i></span><span class="meter-label">an afternoon</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">Placeholder art is generated at runtime, never committed</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Sprites are built procedurally in code: a mirrored silhouette on a 16&times;16 logical grid, upscaled, shaded from a palette ramp with the light top-left, 1px non-black outline. Nothing is written to <code>assets/sprites/</code>.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">The animation layer needed real sprites at the real locked dimensions to animate against, but D-05 says every <em>shipped</em> pixel is hand-drawn. Generating them at runtime keeps both true — a hand-drawn PNG at the expected path is used the moment it exists, with no code change.</span></div>
+        <div class="d-field"><span class="d-key">Not chosen</span><span class="d-val reject"><em>Committing generated PNGs</em> — that would put art in the repo the conformance checker would bless and a future reader would mistake for real.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-23</span>
+        <span class="chip locked">Locked</span>
+        <span><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><span class="meter-label">a refactor</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">All game feel routes through one autoload, and speed is a player control</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Shake, hitstop, flash, pop, lunge and popups all live in <code>src/fx/juice.gd</code>. Playback speed is one multiplier with an in-game 1&times;/2&times;/4&times; toggle.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">"The game feels mushy" should be a tuning session in one file, not an archaeology expedition through fifty scenes. And on a hundredth run the player wants the animation they loved on run one to get out of the way — only possible because the simulation never waits for the view (D-13).</span></div>
+        <div class="d-field"><span class="d-key">Detail</span><span class="d-val">Playback timers ignore <code>time_scale</code>, so a hitstop can never stall the event player. <code>Juice.intensity = 0</code> disables all motion, which doubles as a reduce-motion accessibility setting.</span></div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ================= PROCESS ================= -->
+<section class="section">
+  <div class="section-head">
+    <h2>Process</h2>
+    <span class="count">D-18 – D-19</span>
+  </div>
+  <div class="decisions">
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-18</span>
+        <span class="chip open">Open</span>
+        <span><span class="meter"><i class="on"></i><i></i><i></i><i></i><i></i></span><span class="meter-label">an afternoon</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">Phase 1 gate: is it fun as rectangles?</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">No art until grey-box combat is fun. The current UI is deliberately buttons and text, and is built to be thrown away in Phase 3.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">A deckbuilder that isn't fun as coloured rectangles will not be rescued by pixel art. Finding that out before twelve enemies are drawn is the difference between a redesign and a dead project.</span></div>
+        <div class="d-field"><span class="d-key">Waiting on</span><span class="d-val">A full Act 1 run is now playable end to end. Twenty minutes with it, and a judgement on whether the Mana curve produces an interesting decision every turn.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-19</span>
+        <span class="chip verified">Verified</span>
+        <span><span class="meter"><i class="on"></i><i></i><i></i><i></i><i></i></span><span class="meter-label">an afternoon</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">The art bible is enforced by tooling, not memory</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val"><code>tools/check_art.py</code> decodes every PNG with the standard library — no dependencies — and fails any sprite with off-palette colours or wrong dimensions.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">Palette drift is the documented failure mode of pixel-art projects, and it happens one forgivable exception at a time. A rule a script enforces is a rule; a rule in a document is a hope.</span></div>
+        <div class="d-field"><span class="d-key">Tested</span><span class="d-val">Verified against synthetic conforming and violating PNGs rather than assumed working — it catches both violation types and correctly ignores transparent pixels.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-26</span>
+        <span class="chip verified">Verified</span>
+        <span><span class="meter"><i class="on"></i><i></i><i></i><i></i><i></i></span><span class="meter-label">an afternoon</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">Dev shortcuts resolve through the real path, and are off unless asked for</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Launching with <code>--dev</code> adds a "win fight" button. It deals lethal damage to every enemy and lets normal resolution run, rather than assigning <code>Result.VICTORY</code> directly.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">The reason to skip a fight is to test what comes <em>after</em> it. A shortcut that jumped straight to the result would skip the event queue too, so the reward screen would be reached by a route no player ever takes — and the two would drift apart silently the moment the real path changed.</span></div>
+        <div class="d-field"><span class="d-key">Not chosen</span><span class="d-val reject"><em>Editor-only detection</em> — <code>OS.has_feature("editor")</code> would turn it on inside every test and screenshot run, which is exactly where a hidden win button does the most damage.</span></div>
+      </div>
+    </article>
+
+    <article class="decision">
+      <div class="d-rail">
+        <span class="d-id">D-29</span>
+        <span class="chip locked">Locked</span>
+        <span><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><span class="meter-label">a refactor</span></span>
+      </div>
+      <div class="d-body">
+        <h3 class="d-title">Ship a CC0 art pack and a CC0 audio library instead of hand-drawn art</h3>
+        <div class="d-field"><span class="d-key">Chose</span><span class="d-val">Creature sprites from Kenney's <em>Tiny Dungeon</em>, sound from Kenney's <em>RPG Audio</em>, text in Kenney Pixel — all CC0 1.0, all human-made. Provenance recorded beside each.</span></div>
+        <div class="d-field"><span class="d-key">Why</span><span class="d-val">D-05 made art the critical path for every feature and it stayed there: the game still looked like coloured rectangles, so D-18 could not be judged against anything resembling the real thing. D-04 rules out commissioning until wishlists justify it, so "hand-drawn" meant, in practice, "not drawn".</span></div>
+        <div class="d-field"><span class="d-key">Cost</span><span class="d-val">D-09's locked sizes survive — the pack is 16&times;16 and scales by whole numbers to 64, 96 and 128. <strong>D-08 does not.</strong> The pack carries its own palette and will never conform to Endesga-32, so the palette rule drops to code-drawn UI only.</span></div>
+        <div class="d-field"><span class="d-key">Not chosen</span><span class="d-val reject"><em>AI-assisted pixel tools</em> — still rejected, now for a second reason: they would require the Steam disclosure a CC0 pack does not, for output that needs redrawing anyway. D-06 and the disclosure position are untouched; every asset here is human-made.</span></div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ================= BUILT ================= -->
+<section class="section">
+  <div class="section-head">
+    <h2>What exists today</h2>
+    <span class="count">Phase 1</span>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Area</th><th>Built</th><th>State</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Combat simulation</td><td><strong>Complete</strong> — turns, mana curve, piles, exhaust, reshuffle, statuses, win/lose</td><td>49/49 assertions</td></tr>
+        <tr><td>Cards</td><td><strong>61</strong> — 3 starter, 22 common, 24 uncommon, 12 rare</td><td>All three archetypes</td></tr>
+        <tr><td>Enemies</td><td><strong>11</strong> — 8 normal, 2 elite, 1 boss, telegraphed intents</td><td>10 encounters</td></tr>
+        <tr><td>Statuses</td><td><strong>7</strong> — Strength, Dexterity, Vulnerable, Weak, Frail, Kindling, Afterburn</td><td>Ordered damage pipeline</td></tr>
+        <tr><td>Relics &amp; potions</td><td><strong>16</strong> relics, <strong>11</strong> potions</td><td>Reuse the card effect system</td></tr>
+        <tr><td>Events</td><td><strong>8</strong> events, 23 choices, 10 gated on run state</td><td>Data-driven</td></tr>
+        <tr><td>Map</td><td>8 stages, last is the boss; stage rules, traversal, reachability</td><td>Walkable and completable</td></tr>
+        <tr><td>Run loop</td><td>Rewards, campfire, shop, treasure, boss, save/load, upgrade previews, potion discarding</td><td><strong>Act 1 playable end to end</strong></td></tr>
+        <tr><td>Animation layer</td><td>Fanned cards, sequenced event playback, hit flash, shake, hitstop, popups, dissolve deaths, enemy lunges</td><td><strong>Complete</strong></td></tr>
+        <tr><td>Mana gauge</td><td>Lit / spent / locked pips, ramp ceiling marker, Overload strike-through, embers while in debt</td><td>Animated</td></tr>
+        <tr><td>Map</td><td>Left-to-right node graph, lit paths, pulsing available nodes</td><td>Animated</td></tr>
+        <tr><td>Sprites</td><td>Kenney <em>Tiny Dungeon</em> (CC0), cut and integer-scaled to the locked 64/96/128</td><td><strong>Shipping</strong> — 12 sprites, 0 violations</td></tr>
+        <tr><td>Audio</td><td>Kenney <em>RPG Audio</em> (CC0) — 13 cues behind one autoload</td><td><strong>Shipping</strong> — was silent before</td></tr>
+        <tr><td>Font</td><td>Kenney Pixel (CC0), project-wide, antialiasing off</td><td><strong>Shipping</strong></td></tr>
+        <tr><td>Palette</td><td>Endesga-32 wired through one <code>Palette</code> class</td><td>Candidate, not locked</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <span>Emberwright · decision log · 29 decisions · 3 open</span>
+  <span>Godot 4.7.2 · Act 1 playable &amp; animated · 242/242 passing</span>
+</footer>
+
+</div>

@@ -1,0 +1,1440 @@
+[
+ {
+  "id": "strike",
+  "title": "Scratch",
+  "cost": 1.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "STARTER",
+  "element": "NORMAL",
+  "text": "Deal 6 damage.",
+  "effects": [
+   {
+    "amount": 6.0,
+    "type": "damage",
+    "upgrade_bonus": 3.0
+   }
+  ],
+  "contact": true
+ },
+ {
+  "id": "defend",
+  "title": "Smokescreen",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "STARTER",
+  "element": "NORMAL",
+  "text": "Gain 5 Block.",
+  "effects": [
+   {
+    "amount": 5.0,
+    "type": "block",
+    "upgrade_bonus": 3.0
+   }
+  ]
+ },
+ {
+  "id": "kindle",
+  "title": "Focus Energy",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "STARTER",
+  "element": "NORMAL",
+  "text": "Ramp 1. Draw 1 card.",
+  "effects": [
+   {
+    "amount": 1.0,
+    "type": "ramp"
+   },
+   {
+    "amount": 1.0,
+    "type": "draw",
+    "upgrade_bonus": 1.0
+   }
+  ]
+ },
+ {
+  "id": "ember_jab",
+  "title": "Ember",
+  "cost": 0.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "COMMON",
+  "element": "FIRE",
+  "overload_bonus": true,
+  "text": "Deal 3 damage. Overloaded: deal 3 damage.",
+  "effects": [
+   {
+    "amount": 3.0,
+    "type": "damage",
+    "upgrade_bonus": 2.0
+   },
+   {
+    "condition": "overloaded",
+    "type": "conditional",
+    "effects": [
+     {
+      "amount": 3.0,
+      "type": "damage",
+      "upgrade_bonus": 2.0
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "hammer_fall",
+  "title": "Slash",
+  "cost": 2.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "COMMON",
+  "element": "NORMAL",
+  "text": "Deal 12 damage.",
+  "effects": [
+   {
+    "amount": 12.0,
+    "type": "damage",
+    "upgrade_bonus": 4.0
+   }
+  ],
+  "contact": true
+ },
+ {
+  "id": "searing_blow",
+  "title": "Fire Fang",
+  "cost": 1.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "COMMON",
+  "element": "FIRE",
+  "text": "Deal 7 damage. Apply Attack Down for 2 turns.",
+  "effects": [
+   {
+    "amount": 7.0,
+    "type": "damage",
+    "upgrade_bonus": 3.0
+   },
+   {
+    "stacks": 2.0,
+    "status": "weak",
+    "type": "status"
+   }
+  ],
+  "contact": true
+ },
+ {
+  "id": "cinder_spray",
+  "title": "Incinerate",
+  "cost": 1.0,
+  "type": "ATTACK",
+  "target": "ALL_ENEMIES",
+  "rarity": "COMMON",
+  "element": "FIRE",
+  "text": "Deal 4 damage to ALL enemies.",
+  "effects": [
+   {
+    "amount": 4.0,
+    "target_mode": "ALL_ENEMIES",
+    "type": "damage",
+    "upgrade_bonus": 2.0
+   }
+  ]
+ },
+ {
+  "id": "pin",
+  "title": "Scary Face",
+  "cost": 1.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "COMMON",
+  "element": "NORMAL",
+  "text": "Deal 5 damage. Apply Defense Down for 2 turns.",
+  "effects": [
+   {
+    "amount": 5.0,
+    "type": "damage",
+    "upgrade_bonus": 2.0
+   },
+   {
+    "stacks": 2.0,
+    "status": "vulnerable",
+    "type": "status",
+    "upgrade_bonus": 1.0
+   }
+  ]
+ },
+ {
+  "id": "flare",
+  "title": "Dragon Breath",
+  "cost": 0.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "COMMON",
+  "element": "FIRE",
+  "exhaust": true,
+  "text": "Deal 4 damage. Exhaust.",
+  "effects": [
+   {
+    "amount": 4.0,
+    "type": "damage",
+    "upgrade_bonus": 3.0
+   }
+  ]
+ },
+ {
+  "id": "forge_guard",
+  "title": "Bite",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "COMMON",
+  "element": "NORMAL",
+  "overload_bonus": true,
+  "text": "Gain 6 Block. Overloaded: gain 3 Block.",
+  "effects": [
+   {
+    "amount": 6.0,
+    "type": "block",
+    "upgrade_bonus": 3.0
+   },
+   {
+    "condition": "overloaded",
+    "type": "conditional",
+    "effects": [
+     {
+      "amount": 3.0,
+      "type": "block",
+      "upgrade_bonus": 2.0
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "bellows",
+  "title": "Howl",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "COMMON",
+  "element": "NORMAL",
+  "text": "Overload 2. Draw 1 card.",
+  "effects": [
+   {
+    "amount": 2.0,
+    "type": "overload"
+   },
+   {
+    "amount": 1.0,
+    "type": "draw",
+    "upgrade_bonus": 1.0
+   }
+  ]
+ },
+ {
+  "id": "quench",
+  "title": "Protect",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "COMMON",
+  "element": "NORMAL",
+  "tm": true,
+  "text": "Gain 8 Block. Clear your Overload.",
+  "effects": [
+   {
+    "amount": 8.0,
+    "type": "block",
+    "upgrade_bonus": 4.0
+   },
+   {
+    "type": "clear_overload"
+   }
+  ]
+ },
+ {
+  "id": "anvil_stance",
+  "title": "Metal Claw",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "COMMON",
+  "element": "STEEL",
+  "overload_bonus": true,
+  "text": "Gain 5 Block. Overloaded: draw 1 card.",
+  "effects": [
+   {
+    "amount": 5.0,
+    "type": "block",
+    "upgrade_bonus": 2.0
+   },
+   {
+    "condition": "overloaded",
+    "type": "conditional",
+    "effects": [
+     {
+      "amount": 1.0,
+      "type": "draw"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "stoke",
+  "title": "Leer",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "COMMON",
+  "element": "NORMAL",
+  "exhaust": true,
+  "text": "Ramp 2. Exhaust.",
+  "effects": [
+   {
+    "amount": 2.0,
+    "type": "ramp"
+   }
+  ],
+  "upgraded_effects": [
+   {
+    "amount": 2.0,
+    "type": "ramp"
+   },
+   {
+    "amount": 1.0,
+    "type": "draw"
+   }
+  ]
+ },
+ {
+  "id": "brace",
+  "title": "Defense Curl",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "COMMON",
+  "element": "NORMAL",
+  "text": "Gain 4 Block. Gain 1 Defense.",
+  "effects": [
+   {
+    "amount": 4.0,
+    "type": "block",
+    "upgrade_bonus": 3.0
+   },
+   {
+    "stacks": 1.0,
+    "status": "dexterity",
+    "to_self": true,
+    "type": "status"
+   }
+  ]
+ },
+ {
+  "id": "vent",
+  "title": "Overheat",
+  "cost": 1.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "UNCOMMON",
+  "element": "FIRE",
+  "text": "Spend your remaining PP. Deal 3 damage per PP spent.",
+  "effects": [
+   {
+    "max_spend": 5.0,
+    "payout": "DAMAGE",
+    "per_pp": 3.0,
+    "type": "spend_pp"
+   }
+  ],
+  "upgraded_effects": [
+   {
+    "max_spend": 5.0,
+    "payout": "DAMAGE",
+    "per_pp": 4.0,
+    "type": "spend_pp"
+   }
+  ]
+ },
+ {
+  "id": "temper",
+  "title": "Endure",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "UNCOMMON",
+  "element": "NORMAL",
+  "tm": true,
+  "text": "Spend up to 3 of your remaining PP. Gain 3 Block per PP spent.",
+  "effects": [
+   {
+    "max_spend": 3.0,
+    "payout": "BLOCK",
+    "per_pp": 3.0,
+    "type": "spend_pp"
+   }
+  ],
+  "upgraded_effects": [
+   {
+    "max_spend": 4.0,
+    "payout": "BLOCK",
+    "per_pp": 3.0,
+    "type": "spend_pp"
+   }
+  ]
+ },
+ {
+  "id": "molten_strike",
+  "title": "Flamethrower",
+  "cost": 2.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "UNCOMMON",
+  "element": "FIRE",
+  "overload_bonus": true,
+  "text": "Deal 9 damage. Overloaded: apply Defense Down for 2 turns.",
+  "effects": [
+   {
+    "amount": 9.0,
+    "type": "damage",
+    "upgrade_bonus": 3.0
+   },
+   {
+    "condition": "overloaded",
+    "type": "conditional",
+    "effects": [
+     {
+      "stacks": 2.0,
+      "status": "vulnerable",
+      "type": "status"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "overdrive",
+  "title": "Take Down",
+  "cost": 1.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "UNCOMMON",
+  "element": "NORMAL",
+  "text": "Deal 6 damage. Overload 2.",
+  "effects": [
+   {
+    "amount": 6.0,
+    "type": "damage",
+    "upgrade_bonus": 3.0
+   },
+   {
+    "amount": 2.0,
+    "type": "overload"
+   }
+  ],
+  "contact": true
+ },
+ {
+  "id": "backdraft",
+  "title": "Fire Spin",
+  "cost": 2.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "UNCOMMON",
+  "element": "FIRE",
+  "overload_bonus": true,
+  "text": "Deal 8 damage. Overloaded: deal 8 damage.",
+  "effects": [
+   {
+    "amount": 8.0,
+    "type": "damage",
+    "upgrade_bonus": 3.0
+   },
+   {
+    "condition": "overloaded",
+    "type": "conditional",
+    "effects": [
+     {
+      "amount": 8.0,
+      "type": "damage",
+      "upgrade_bonus": 3.0
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "slag_toss",
+  "title": "Lava Plume",
+  "cost": 1.0,
+  "type": "ATTACK",
+  "target": "ALL_ENEMIES",
+  "rarity": "UNCOMMON",
+  "element": "FIRE",
+  "text": "Deal 6 damage to ALL enemies. Apply Attack Down to ALL enemies for 1 turn.",
+  "effects": [
+   {
+    "amount": 6.0,
+    "target_mode": "ALL_ENEMIES",
+    "type": "damage",
+    "upgrade_bonus": 2.0
+   },
+   {
+    "stacks": 1.0,
+    "status": "weak",
+    "type": "status",
+    "upgrade_bonus": 1.0
+   }
+  ]
+ },
+ {
+  "id": "second_wind",
+  "title": "Agility",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "UNCOMMON",
+  "element": "PSYCHIC",
+  "tm": true,
+  "exhaust": true,
+  "text": "Overload 1. Draw 2 cards. Exhaust.",
+  "effects": [
+   {
+    "amount": 1.0,
+    "type": "overload"
+   },
+   {
+    "amount": 2.0,
+    "type": "draw",
+    "upgrade_bonus": 1.0
+   }
+  ]
+ },
+ {
+  "id": "tongs",
+  "title": "Work Up",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "UNCOMMON",
+  "element": "NORMAL",
+  "text": "Draw 2 cards. Overload 1.",
+  "effects": [
+   {
+    "amount": 2.0,
+    "type": "draw",
+    "upgrade_bonus": 1.0
+   },
+   {
+    "amount": 1.0,
+    "type": "overload"
+   }
+  ]
+ },
+ {
+  "id": "kindling",
+  "title": "Sharpen",
+  "cost": 1.0,
+  "type": "POWER",
+  "target": "SELF",
+  "rarity": "UNCOMMON",
+  "element": "NORMAL",
+  "text": "At the start of your turn, Ramp 1.",
+  "effects": [
+   {
+    "stacks": 1.0,
+    "status": "kindling",
+    "to_self": true,
+    "type": "status",
+    "upgrade_bonus": 1.0
+   }
+  ]
+ },
+ {
+  "id": "afterburn",
+  "title": "Inferno",
+  "cost": 1.0,
+  "type": "POWER",
+  "target": "SELF",
+  "rarity": "UNCOMMON",
+  "element": "FIRE",
+  "text": "Whenever you Overload, deal 3 damage to a random enemy.",
+  "effects": [
+   {
+    "stacks": 3.0,
+    "status": "afterburn",
+    "to_self": true,
+    "type": "status",
+    "upgrade_bonus": 2.0
+   }
+  ]
+ },
+ {
+  "id": "forge_body",
+  "title": "Rage",
+  "cost": 2.0,
+  "type": "POWER",
+  "target": "SELF",
+  "rarity": "UNCOMMON",
+  "element": "NORMAL",
+  "text": "Gain 2 Attack.",
+  "effects": [
+   {
+    "stacks": 2.0,
+    "status": "strength",
+    "to_self": true,
+    "type": "status",
+    "upgrade_bonus": 1.0
+   }
+  ]
+ },
+ {
+  "id": "temperance",
+  "title": "Double Team",
+  "cost": 1.0,
+  "type": "POWER",
+  "target": "SELF",
+  "rarity": "UNCOMMON",
+  "element": "NORMAL",
+  "tm": true,
+  "text": "Gain 2 Defense.",
+  "effects": [
+   {
+    "stacks": 2.0,
+    "status": "dexterity",
+    "to_self": true,
+    "type": "status",
+    "upgrade_bonus": 1.0
+   }
+  ]
+ },
+ {
+  "id": "crucible",
+  "title": "Blast Burn",
+  "cost": 3.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "RARE",
+  "element": "FIRE",
+  "text": "Deal 20 damage. Overload 2.",
+  "effects": [
+   {
+    "amount": 20.0,
+    "type": "damage",
+    "upgrade_bonus": 6.0
+   },
+   {
+    "amount": 2.0,
+    "type": "overload"
+   }
+  ]
+ },
+ {
+  "id": "immolate",
+  "title": "Heat Wave",
+  "cost": 2.0,
+  "type": "ATTACK",
+  "target": "ALL_ENEMIES",
+  "rarity": "RARE",
+  "element": "FIRE",
+  "tm": true,
+  "overload_bonus": true,
+  "text": "Deal 6 damage to ALL enemies. Overloaded: deal 6 damage to ALL enemies.",
+  "effects": [
+   {
+    "amount": 6.0,
+    "target_mode": "ALL_ENEMIES",
+    "type": "damage",
+    "upgrade_bonus": 2.0
+   },
+   {
+    "condition": "overloaded",
+    "type": "conditional",
+    "effects": [
+     {
+      "amount": 6.0,
+      "target_mode": "ALL_ENEMIES",
+      "type": "damage",
+      "upgrade_bonus": 2.0
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "forge_master",
+  "title": "Howl II",
+  "cost": 3.0,
+  "type": "POWER",
+  "target": "SELF",
+  "rarity": "RARE",
+  "element": "NORMAL",
+  "text": "Gain 2 Attack. At the start of your turn, Ramp 1.",
+  "effects": [
+   {
+    "stacks": 2.0,
+    "status": "strength",
+    "to_self": true,
+    "type": "status",
+    "upgrade_bonus": 1.0
+   },
+   {
+    "stacks": 1.0,
+    "status": "kindling",
+    "to_self": true,
+    "type": "status"
+   }
+  ]
+ },
+ {
+  "id": "last_ember",
+  "title": "Endure II",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "RARE",
+  "element": "NORMAL",
+  "exhaust": true,
+  "text": "Overload 3. Gain 12 Block. Exhaust.",
+  "effects": [
+   {
+    "amount": 3.0,
+    "type": "overload"
+   },
+   {
+    "amount": 12.0,
+    "type": "block",
+    "upgrade_bonus": 5.0
+   }
+  ]
+ },
+ {
+  "id": "cinder_flick",
+  "title": "Fury Swipes",
+  "cost": 0.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "COMMON",
+  "element": "NORMAL",
+  "text": "Deal 2 damage 2 times.",
+  "effects": [
+   {
+    "amount": 2.0,
+    "hits": 2.0,
+    "type": "damage",
+    "upgrade_bonus": 1.0
+   }
+  ],
+  "contact": true
+ },
+ {
+  "id": "tap",
+  "title": "Substitute",
+  "cost": 0.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "COMMON",
+  "element": "NORMAL",
+  "exhaust": true,
+  "text": "Gain 2 PP. Deal 3 damage to yourself. Exhaust.",
+  "effects": [
+   {
+    "amount": 2.0,
+    "type": "pp",
+    "upgrade_bonus": 1.0
+   },
+   {
+    "amount": 3.0,
+    "bypass_block": true,
+    "target_mode": "SELF",
+    "type": "damage"
+   }
+  ]
+ },
+ {
+  "id": "rake",
+  "title": "Rock Throw",
+  "cost": 1.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "COMMON",
+  "element": "ROCK",
+  "text": "Deal 5 damage. Apply Guard Down for 2 turns.",
+  "effects": [
+   {
+    "amount": 5.0,
+    "type": "damage",
+    "upgrade_bonus": 2.0
+   },
+   {
+    "stacks": 2.0,
+    "status": "frail",
+    "type": "status",
+    "upgrade_bonus": 1.0
+   }
+  ]
+ },
+ {
+  "id": "hearth_guard",
+  "title": "Reflect",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "COMMON",
+  "element": "NORMAL",
+  "text": "Gain 5 Block. At maximum PP: gain 5 Block.",
+  "effects": [
+   {
+    "amount": 5.0,
+    "type": "block",
+    "upgrade_bonus": 2.0
+   },
+   {
+    "condition": "at_pp_cap",
+    "type": "conditional",
+    "effects": [
+     {
+      "amount": 5.0,
+      "type": "block",
+      "upgrade_bonus": 2.0
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "scrap",
+  "title": "Flame Charge",
+  "cost": 1.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "COMMON",
+  "element": "NORMAL",
+  "text": "Deal 4 damage. Free of debt: deal 4 damage.",
+  "effects": [
+   {
+    "amount": 4.0,
+    "type": "damage",
+    "upgrade_bonus": 2.0
+   },
+   {
+    "condition": "no_overload",
+    "type": "conditional",
+    "effects": [
+     {
+      "amount": 4.0,
+      "type": "damage",
+      "upgrade_bonus": 2.0
+     }
+    ]
+   }
+  ],
+  "contact": true
+ },
+ {
+  "id": "swage",
+  "title": "Detect",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "COMMON",
+  "element": "FIGHTING",
+  "tm": true,
+  "text": "Gain 6 Block. If your hand is empty: draw 2 cards.",
+  "effects": [
+   {
+    "amount": 6.0,
+    "type": "block",
+    "upgrade_bonus": 3.0
+   },
+   {
+    "condition": "hand_empty",
+    "type": "conditional",
+    "effects": [
+     {
+      "amount": 2.0,
+      "type": "draw"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "soot_cloud",
+  "title": "Growl",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "ALL_ENEMIES",
+  "rarity": "COMMON",
+  "element": "NORMAL",
+  "text": "Apply Attack Down to ALL enemies for 2 turns.",
+  "effects": [
+   {
+    "stacks": 2.0,
+    "status": "weak",
+    "type": "status",
+    "upgrade_bonus": 1.0
+   }
+  ]
+ },
+ {
+  "id": "wedge",
+  "title": "Stomp",
+  "cost": 1.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "COMMON",
+  "element": "NORMAL",
+  "text": "Deal 3 damage. If the enemy is Vulnerable: deal 6 damage.",
+  "effects": [
+   {
+    "amount": 3.0,
+    "type": "damage",
+    "upgrade_bonus": 1.0
+   },
+   {
+    "condition": "target_vulnerable",
+    "type": "conditional",
+    "effects": [
+     {
+      "amount": 6.0,
+      "type": "damage",
+      "upgrade_bonus": 3.0
+     }
+    ]
+   }
+  ],
+  "contact": true
+ },
+ {
+  "id": "banked_coals",
+  "title": "Bulk Up",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "COMMON",
+  "element": "FIGHTING",
+  "tm": true,
+  "text": "Ramp 1. Gain 4 Block.",
+  "effects": [
+   {
+    "amount": 1.0,
+    "type": "ramp"
+   },
+   {
+    "amount": 4.0,
+    "type": "block",
+    "upgrade_bonus": 3.0
+   }
+  ]
+ },
+ {
+  "id": "clinker",
+  "title": "Fury Cutter",
+  "cost": 2.0,
+  "type": "ATTACK",
+  "target": "RANDOM_ENEMY",
+  "rarity": "COMMON",
+  "element": "STEEL",
+  "tm": true,
+  "text": "Deal 6 damage 3 times to a random enemy.",
+  "effects": [
+   {
+    "amount": 6.0,
+    "hits": 3.0,
+    "target_mode": "RANDOM_ENEMY",
+    "type": "damage",
+    "upgrade_bonus": 2.0
+   }
+  ],
+  "contact": true
+ },
+ {
+  "id": "slake",
+  "title": "Roost",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "UNCOMMON",
+  "element": "FLYING",
+  "tm": true,
+  "text": "Clear your Overload. Draw 2 cards.",
+  "effects": [
+   {
+    "type": "clear_overload"
+   },
+   {
+    "amount": 2.0,
+    "type": "draw",
+    "upgrade_bonus": 1.0
+   }
+  ]
+ },
+ {
+  "id": "runoff",
+  "title": "Swords Dance",
+  "cost": 2.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "UNCOMMON",
+  "element": "NORMAL",
+  "tm": true,
+  "exhaust": true,
+  "text": "Gain 4 PP. Exhaust.",
+  "effects": [
+   {
+    "amount": 4.0,
+    "type": "pp",
+    "upgrade_bonus": 2.0
+   }
+  ]
+ },
+ {
+  "id": "cast_off",
+  "title": "Fire Blast",
+  "cost": 1.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "UNCOMMON",
+  "element": "FIRE",
+  "text": "Spend up to 2 of your remaining PP. Deal 5 damage per PP spent.",
+  "effects": [
+   {
+    "max_spend": 2.0,
+    "payout": "DAMAGE",
+    "per_pp": 5.0,
+    "type": "spend_pp"
+   }
+  ],
+  "upgraded_effects": [
+   {
+    "max_spend": 2.0,
+    "payout": "DAMAGE",
+    "per_pp": 7.0,
+    "type": "spend_pp"
+   }
+  ]
+ },
+ {
+  "id": "slag_wall",
+  "title": "Rock Tomb",
+  "cost": 2.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "UNCOMMON",
+  "element": "ROCK",
+  "text": "Gain 10 Block. Apply Guard Down to yourself for 1 turn.",
+  "effects": [
+   {
+    "amount": 10.0,
+    "type": "block",
+    "upgrade_bonus": 4.0
+   },
+   {
+    "stacks": 1.0,
+    "status": "frail",
+    "to_self": true,
+    "type": "status"
+   }
+  ]
+ },
+ {
+  "id": "overpull",
+  "title": "Dragon Rage",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "UNCOMMON",
+  "element": "DRAGON",
+  "text": "Overload 2. Ramp 1.",
+  "effects": [
+   {
+    "amount": 2.0,
+    "type": "overload"
+   },
+   {
+    "amount": 1.0,
+    "type": "ramp",
+    "upgrade_bonus": 1.0
+   }
+  ]
+ },
+ {
+  "id": "white_coal",
+  "title": "Coil",
+  "cost": 2.0,
+  "type": "POWER",
+  "target": "SELF",
+  "rarity": "UNCOMMON",
+  "element": "POISON",
+  "text": "Gain 1 Attack. Gain 1 Defense.",
+  "effects": [
+   {
+    "stacks": 1.0,
+    "status": "strength",
+    "to_self": true,
+    "type": "status",
+    "upgrade_bonus": 1.0
+   },
+   {
+    "stacks": 1.0,
+    "status": "dexterity",
+    "to_self": true,
+    "type": "status",
+    "upgrade_bonus": 1.0
+   }
+  ]
+ },
+ {
+  "id": "backblast",
+  "title": "Flare Blitz",
+  "cost": 2.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "UNCOMMON",
+  "element": "FIRE",
+  "overload_bonus": true,
+  "text": "Deal 10 damage. Overloaded: apply Attack Down for 2 turns.",
+  "effects": [
+   {
+    "amount": 10.0,
+    "type": "damage",
+    "upgrade_bonus": 3.0
+   },
+   {
+    "condition": "overloaded",
+    "type": "conditional",
+    "effects": [
+     {
+      "stacks": 2.0,
+      "status": "weak",
+      "type": "status",
+      "upgrade_bonus": 1.0
+     }
+    ]
+   }
+  ],
+  "contact": true
+ },
+ {
+  "id": "draught",
+  "title": "Iron Tail",
+  "cost": 1.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "UNCOMMON",
+  "element": "STEEL",
+  "tm": true,
+  "text": "Gain 4 Block. At maximum PP: draw 2 cards.",
+  "effects": [
+   {
+    "amount": 4.0,
+    "type": "block",
+    "upgrade_bonus": 2.0
+   },
+   {
+    "condition": "at_pp_cap",
+    "type": "conditional",
+    "effects": [
+     {
+      "amount": 2.0,
+      "type": "draw"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "firecrack",
+  "title": "Flame Burst",
+  "cost": 1.0,
+  "type": "ATTACK",
+  "target": "ALL_ENEMIES",
+  "rarity": "UNCOMMON",
+  "element": "FIRE",
+  "text": "Deal 3 damage to ALL enemies. Apply Defense Down to ALL enemies for 1 turn.",
+  "effects": [
+   {
+    "amount": 3.0,
+    "target_mode": "ALL_ENEMIES",
+    "type": "damage",
+    "upgrade_bonus": 1.0
+   },
+   {
+    "stacks": 1.0,
+    "status": "vulnerable",
+    "type": "status",
+    "upgrade_bonus": 1.0
+   }
+  ]
+ },
+ {
+  "id": "hard_face",
+  "title": "Brick Break",
+  "cost": 2.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "UNCOMMON",
+  "element": "FIGHTING",
+  "tm": true,
+  "text": "Gain 8 Block. Gain 1 Defense. Clear your Overload.",
+  "effects": [
+   {
+    "amount": 8.0,
+    "type": "block",
+    "upgrade_bonus": 3.0
+   },
+   {
+    "stacks": 1.0,
+    "status": "dexterity",
+    "to_self": true,
+    "type": "status"
+   },
+   {
+    "type": "clear_overload"
+   }
+  ]
+ },
+ {
+  "id": "pull_chain",
+  "title": "Quick Attack",
+  "cost": 0.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "UNCOMMON",
+  "element": "NORMAL",
+  "exhaust": true,
+  "text": "Overload 1. Draw 1 card. Exhaust.",
+  "effects": [
+   {
+    "amount": 1.0,
+    "type": "overload"
+   },
+   {
+    "amount": 1.0,
+    "type": "draw",
+    "upgrade_bonus": 1.0
+   }
+  ]
+ },
+ {
+  "id": "dross",
+  "title": "Poison Sting",
+  "cost": 0.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "UNCOMMON",
+  "element": "POISON",
+  "text": "Deal 3 damage. Apply Attack Down for 1 turn.",
+  "effects": [
+   {
+    "amount": 3.0,
+    "type": "damage",
+    "upgrade_bonus": 2.0
+   },
+   {
+    "stacks": 1.0,
+    "status": "weak",
+    "type": "status"
+   }
+  ],
+  "contact": true
+ },
+ {
+  "id": "white_hot",
+  "title": "Dragon Dance",
+  "cost": 3.0,
+  "type": "POWER",
+  "target": "SELF",
+  "rarity": "RARE",
+  "element": "DRAGON",
+  "tm": true,
+  "text": "Gain 2 Attack. Gain 2 Defense. At the start of your turn, Ramp 1.",
+  "effects": [
+   {
+    "stacks": 2.0,
+    "status": "strength",
+    "to_self": true,
+    "type": "status",
+    "upgrade_bonus": 1.0
+   },
+   {
+    "stacks": 2.0,
+    "status": "dexterity",
+    "to_self": true,
+    "type": "status",
+    "upgrade_bonus": 1.0
+   },
+   {
+    "stacks": 1.0,
+    "status": "kindling",
+    "to_self": true,
+    "type": "status"
+   }
+  ]
+ },
+ {
+  "id": "great_bellows",
+  "title": "Roar",
+  "cost": 2.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "RARE",
+  "element": "NORMAL",
+  "text": "Ramp 3. Draw 2 cards.",
+  "effects": [
+   {
+    "amount": 3.0,
+    "type": "ramp",
+    "upgrade_bonus": 1.0
+   },
+   {
+    "amount": 2.0,
+    "type": "draw"
+   }
+  ]
+ },
+ {
+  "id": "tap_the_furnace",
+  "title": "Hone Claws",
+  "cost": 2.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "RARE",
+  "element": "FIRE",
+  "text": "Gain 3 PP. Ramp 2.",
+  "effects": [
+   {
+    "amount": 3.0,
+    "type": "pp",
+    "upgrade_bonus": 1.0
+   },
+   {
+    "amount": 2.0,
+    "type": "ramp"
+   }
+  ]
+ },
+ {
+  "id": "runout",
+  "title": "Rock Slide",
+  "cost": 3.0,
+  "type": "ATTACK",
+  "target": "ALL_ENEMIES",
+  "rarity": "RARE",
+  "element": "ROCK",
+  "text": "Deal 10 damage to ALL enemies. Apply Guard Down to ALL enemies for 2 turns.",
+  "effects": [
+   {
+    "amount": 10.0,
+    "target_mode": "ALL_ENEMIES",
+    "type": "damage",
+    "upgrade_bonus": 3.0
+   },
+   {
+    "stacks": 2.0,
+    "status": "frail",
+    "type": "status",
+    "upgrade_bonus": 1.0
+   }
+  ]
+ },
+ {
+  "id": "anvil_song",
+  "title": "Comet Punch",
+  "cost": 2.0,
+  "type": "ATTACK",
+  "target": "ENEMY",
+  "rarity": "RARE",
+  "element": "NORMAL",
+  "text": "Deal 4 damage 4 times.",
+  "effects": [
+   {
+    "amount": 4.0,
+    "hits": 4.0,
+    "type": "damage",
+    "upgrade_bonus": 1.0
+   }
+  ],
+  "contact": true
+ },
+ {
+  "id": "deep_draught",
+  "title": "Nasty Plot",
+  "cost": 3.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "RARE",
+  "element": "NORMAL",
+  "exhaust": true,
+  "text": "Gain 5 PP. Draw 3 cards. Exhaust.",
+  "effects": [
+   {
+    "amount": 5.0,
+    "type": "pp",
+    "upgrade_bonus": 1.0
+   },
+   {
+    "amount": 3.0,
+    "type": "draw"
+   }
+  ]
+ },
+ {
+  "id": "cold_shut",
+  "title": "Rest",
+  "cost": 2.0,
+  "type": "SKILL",
+  "target": "SELF",
+  "rarity": "RARE",
+  "element": "PSYCHIC",
+  "tm": true,
+  "text": "Clear your Overload. Gain 12 Block. Gain 1 Defense.",
+  "effects": [
+   {
+    "type": "clear_overload"
+   },
+   {
+    "amount": 12.0,
+    "type": "block",
+    "upgrade_bonus": 5.0
+   },
+   {
+    "stacks": 1.0,
+    "status": "dexterity",
+    "to_self": true,
+    "type": "status"
+   }
+  ]
+ },
+ {
+  "id": "forge_light",
+  "title": "Sunny Day",
+  "cost": 2.0,
+  "type": "POWER",
+  "target": "SELF",
+  "rarity": "RARE",
+  "element": "FIRE",
+  "tm": true,
+  "text": "At the start of your turn, Ramp 1. Whenever you Overload, deal 3 damage to a random enemy.",
+  "effects": [
+   {
+    "stacks": 1.0,
+    "status": "kindling",
+    "to_self": true,
+    "type": "status",
+    "upgrade_bonus": 1.0
+   },
+   {
+    "stacks": 3.0,
+    "status": "afterburn",
+    "to_self": true,
+    "type": "status",
+    "upgrade_bonus": 2.0
+   }
+  ]
+ }
+]

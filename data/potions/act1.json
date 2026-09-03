@@ -1,0 +1,60 @@
+[
+  {
+    "id": "ember_flask", "title": "Leppa Berry", "rarity": "COMMON", "target": "SELF",
+    "text": "Gain 3 PP.",
+    "effects": [{"type": "pp", "amount": 3}]
+  },
+  {
+    "id": "blood_potion", "title": "Potion", "rarity": "COMMON", "target": "SELF",
+    "text": "Heal 12 HP.",
+    "effects": [{"type": "heal", "amount": 12}]
+  },
+  {
+    "id": "block_potion", "title": "X Defend", "rarity": "COMMON", "target": "SELF",
+    "text": "Gain 12 Block.",
+    "effects": [{"type": "block", "amount": 12}]
+  },
+  {
+    "id": "fire_potion", "title": "Geo Pebble", "rarity": "COMMON", "target": "ENEMY",
+    "text": "Deal 20 damage.",
+    "effects": [{"type": "damage", "amount": 20}]
+  },
+  {
+    "id": "draught_of_haste", "title": "Ether", "rarity": "COMMON", "target": "SELF",
+    "text": "Draw 3 cards.",
+    "effects": [{"type": "draw", "amount": 3}]
+  },
+  {
+    "id": "weak_flask", "title": "Stun Seed", "rarity": "COMMON", "target": "ENEMY",
+    "text": "Apply 3 Weak.",
+    "effects": [{"type": "status", "status": "weak", "stacks": 3}]
+  },
+  {
+    "id": "strength_potion", "title": "X Attack", "rarity": "UNCOMMON", "target": "SELF",
+    "text": "Gain 2 Strength.",
+    "effects": [{"type": "status", "status": "strength", "stacks": 2, "to_self": true}]
+  },
+  {
+    "id": "mana_potion", "title": "Elixir", "rarity": "UNCOMMON", "target": "SELF",
+    "text": "Gain 2 PP.",
+    "effects": [{"type": "pp", "amount": 2}]
+  },
+  {
+    "id": "quenching_oil", "title": "Reviver Seed", "rarity": "UNCOMMON", "target": "SELF",
+    "text": "Gain 20 Block. Clear your Overload.",
+    "effects": [{"type": "block", "amount": 20}, {"type": "clear_overload"}]
+  },
+  {
+    "id": "white_hot_tincture", "title": "Violent Seed", "rarity": "RARE", "target": "SELF",
+    "text": "Ramp 2 and gain 2 Strength.",
+    "effects": [
+      {"type": "ramp", "amount": 2},
+      {"type": "status", "status": "strength", "stacks": 2, "to_self": true}
+    ]
+  },
+  {
+    "id": "molten_draught", "title": "Blast Seed", "rarity": "RARE", "target": "ALL_ENEMIES",
+    "text": "Deal 14 damage to ALL enemies.",
+    "effects": [{"type": "damage", "amount": 14, "target_mode": "ALL_ENEMIES"}]
+  }
+]

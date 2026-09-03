@@ -1,0 +1,50 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Emberwright"
+config/description="A pixel-art roguelike deckbuilder."
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+config/icon="res://icon.svg"
+
+[autoload]
+
+Juice="*res://src/fx/juice.gd"
+Rng="*res://src/core/rng.gd"
+Audio="*res://src/fx/audio.gd"
+
+[display]
+
+window/size/viewport_width=960
+window/size/viewport_height=540
+; 3x the 960x540 base. scale_mode=integer means a display too small for 3x
+; falls back to 2x rather than to a blurry fractional scale, so raising this
+; can only ever make the game bigger, never worse.
+window/size/window_width_override=2880
+window/size/window_height_override=1620
+window/size/resizable=true
+window/stretch/mode="viewport"
+window/stretch/scale_mode="integer"
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+
+[gui]
+
+; Kenney Pixel was tried here and reverted: at the sizes this UI needs it reads
+; thin and muddy, and compensating by doubling every label made it worse. The
+; art bible still asks for one 8px bitmap family (ART_BIBLE section 2) and that
+; goal stands -- but it needs a font that is legible at 1x, not just authentic.
+; The .ttf files stay in assets/fonts/ for a future attempt.

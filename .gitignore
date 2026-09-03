@@ -1,0 +1,19 @@
+# Godot 4
+.godot/
+.import/
+export.cfg
+# export_presets.cfg is tracked: the Pages workflow needs the Web preset to build.
+*.translation
+
+# Exports
+build/
+dist/
+
+# macOS
+.DS_Store
+
+# Aseprite backups
+*.aseprite-autosave
+
+# Local telemetry
+telemetry/*.json

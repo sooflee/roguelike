@@ -1,0 +1,39 @@
+GIMP Palette
+Name: Endesga 32
+Columns: 8
+# Candidate palette for Emberwright (docs/DECISIONS.md D-08, still OPEN).
+# By Endesga. Verify the licence on its Lospec page before locking it.
+# To lock: cp endesga-32.gpl emberwright.gpl  -- tools/check_art.py then enforces it.
+#
+190  74  47	ember deep
+215 118  67	ember mid
+234 212 170	bone
+228 166 114	skin light
+184 111  80	leather
+115  62  57	rust
+ 62  39  49	shadow
+162  38  51	blood
+228  59  68	red
+247 118  34	EMBER (reserved: Heat / Stoked)
+254 174  52	flame
+254 231  97	spark
+ 99 199  77	moss
+ 62 137  72	moss dark
+ 38  92  66	moss deeper
+ 25  60  62	teal dark
+ 18  78 137	quench deep
+  0 153 219	quench
+ 44 232 245	quench bright
+255 255 255	white
+192 203 220	ink light
+139 155 180	ink mid
+ 90 105 136	ink muted
+ 58  68 102	border
+ 38  43  68	surface
+ 24  20  37	ground
+255   0  68	alarm
+104  56 108	violet dark
+181  80 136	violet
+246 117 122	rose
+232 183 150	sand
+194 133 105	clay
