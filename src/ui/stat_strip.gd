@@ -15,6 +15,9 @@ const ICON := 24
 const PAIR_GAP := 5
 const GROUP_GAP := 16
 
+## The deck counter is the one vital you can act on: it opens the deck.
+signal deck_clicked
+
 var _hp: Label
 var _gold: Label
 var _deck: Label
@@ -30,7 +33,9 @@ func _ready() -> void:
 	add_child(vitals)
 	_hp = _pair(vitals, "hud_hp", Palette.ROSE, "Health")
 	_gold = _pair(vitals, "hud_gold", Palette.SPARK, "Gold")
-	_deck = _pair(vitals, "hud_deck", Palette.INK_LIGHT, "Moves in your deck")
+	_deck = _pair(vitals, "hud_deck", Palette.INK_LIGHT,
+		"Moves in your deck — click to look through them",
+		func(): deck_clicked.emit())
 	_seed = _plain(vitals, Palette.INK_MUTED)
 
 	_bag_row = HBoxContainer.new()
@@ -50,7 +55,9 @@ func _ready() -> void:
 	_bag_row.add_child(_bag_empty)
 
 ## An icon and the number beside it, as one group so they never wrap apart.
-func _pair(into: HBoxContainer, glyph: String, colour: Color, tip: String) -> Label:
+## `on_click` makes the group a control rather than a readout.
+func _pair(into: HBoxContainer, glyph: String, colour: Color, tip: String,
+		on_click: Callable = Callable()) -> Label:
 	var box := HBoxContainer.new()
 	box.add_theme_constant_override("separation", PAIR_GAP)
 	box.tooltip_text = tip
@@ -64,6 +71,17 @@ func _pair(into: HBoxContainer, glyph: String, colour: Color, tip: String) -> La
 	icon.custom_minimum_size = Vector2(ICON, ICON)
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	box.add_child(icon)
+	if on_click.is_valid():
+		box.mouse_filter = Control.MOUSE_FILTER_STOP
+		# Brightening on hover rather than switching to a hand cursor: the run
+		# sets its own poke ball cursor for CURSOR_ARROW only, so asking for a
+		# pointing hand here would drop the OS arrow back into the game.
+		box.mouse_entered.connect(func(): icon.modulate = Color(1.35, 1.35, 1.35))
+		box.mouse_exited.connect(func(): icon.modulate = Color.WHITE)
+		box.gui_input.connect(func(e: InputEvent):
+			if e is InputEventMouseButton and e.pressed \
+					and e.button_index == MOUSE_BUTTON_LEFT:
+				on_click.call())
 	var l := Label.new()
 	l.add_theme_font_size_override("font_size", 15)
 	l.add_theme_color_override("font_color", colour)

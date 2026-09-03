@@ -30,6 +30,7 @@ var _actions: HBoxContainer
 var _relic_strip: RelicStrip
 var _focus_target: Control = null
 var _title_view: TitleView = null
+var _deck_view: DeckView = null
 var _ending_view: EndingView = null
 var _combat_panel: Control
 var _map_view: Node2D
@@ -90,6 +91,7 @@ func _build_chrome() -> void:
 	_chrome = pad
 
 	_stats = StatStrip.new()
+	_stats.deck_clicked.connect(_show_deck)
 	root.add_child(_stats)
 
 	# Top right, outside the padded column, so it sits in the corner rather than
@@ -324,6 +326,33 @@ func _show_title() -> void:
 		_close_title()
 		RunState.delete_save()
 		_start_new_run())
+
+## The deck, over the top of whatever screen is already up.
+##
+## Added to this Control rather than to _body, so _clear_body() cannot take it
+## down and the screen underneath survives untouched -- see DeckView.
+func _show_deck() -> void:
+	if run == null or (_deck_view and is_instance_valid(_deck_view)):
+		return
+	Audio.play(&"ui", 1.0, 0.5)
+	_deck_view = DeckView.new()
+	add_child(_deck_view)
+	_deck_view.setup(run.deck)
+	_deck_view.closed.connect(_close_deck)
+	_suspend_map(true)
+
+func _close_deck() -> void:
+	if _deck_view and is_instance_valid(_deck_view):
+		_deck_view.queue_free()
+		_deck_view = null
+	_suspend_map(false)
+
+## The map answers arrow keys and Enter from _input(), which Godot runs whatever
+## has focus. With the deck open over it, Enter would walk onto a map node the
+## player cannot currently see and cannot have meant to choose.
+func _suspend_map(quiet: bool) -> void:
+	if _map_view and is_instance_valid(_map_view):
+		_map_view.set_process_input(not quiet)
 
 func _close_title() -> void:
 	if _title_view and is_instance_valid(_title_view):

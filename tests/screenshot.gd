@@ -127,7 +127,21 @@ func _process(_d: float) -> void:
 				_frames = 0
 		8:
 			if _frames > 25:
+				# Parked on a stage nothing matches, first: _process() keeps
+				# running while the awaits below are pending, and re-entering
+				# here re-shot the reward screen every frame and then called
+				# _close_deck() on whatever _screen had become by then.
+				_stage = 99
 				await _snap("05_reward")
+				var run_screen := _screen
+				# The deck overlay, over the reward screen on purpose: the whole
+				# point of it being an overlay is that what is underneath is
+				# still there when it closes.
+				run_screen._show_deck()
+				for _i in 6:
+					await get_tree().process_frame
+				await _snap("19_deck")
+				run_screen._close_deck()
 				_stage = 9
 		9:
 			if _screen: _screen.queue_free()
